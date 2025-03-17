@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wufeiqun.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wufeiqun.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="name" property="name" />
+        <result column="mobile" property="mobile" />
+        <result column="email" property="email" />
+        <result column="department_code" property="departmentCode" />
+        <result column="type" property="type" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_user" property="updateUser" />
+        <result column="comment" property="comment" />
+        <result column="status" property="status" />
+        <result column="password" property="password" />
+        <result column="workwx_id" property="workwxId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, account, name, mobile, email, department_code, type, create_time, update_time, create_user, update_user, comment, status, password, workwx_id
+    </sql>
+
+</mapper>
