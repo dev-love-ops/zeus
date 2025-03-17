@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <property name="dateFormat" value="yyyy-MM-dd"/>
+    <property name="max.history" value="2"/>
+    <property name="never.block" value="true"/>
+    <property name="queue.size" value="1024"/>
+    <property name="ex.depth" value="full"/>
+    <!--  归档日志总大小  -->
+    <property name="total.size.cap" value="10GB"/>
+    <property name="logHome" value="/data/logs/zeus"/>
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%cyan(%t)] [%yellow(%c)]-[%highlight(%p)] %m%n</pattern>
+<!--            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss,SSS}) [%cyan(%t)] [%yellow(%c)]-[%highlight(%p)] %m%n</pattern>-->
+        </encoder>
+    </appender>
+
+    <!-- info 日志-->
+    <appender name="FILE-APPENDER-INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logHome}/${appCode}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logHome}/zeus.log.%d{${dateFormat}}</fileNamePattern>
+            <MaxHistory>${max.history}</MaxHistory>
+            <totalSizeCap>${total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%cyan(%t)] [%yellow(%c)]-[%highlight(%p)] %m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC-FILE-APPENDER-INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${queue.size}</queueSize>
+        <neverBlock>${never.block}</neverBlock>
+        <appender-ref ref="FILE-APPENDER-INFO"/>
+    </appender>
+<!--异常日志-->
+    <appender name="FILE-APPENDER-WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logHome}/zeus.log.error</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logHome}/zeus.log.error.%d{${dateFormat}}</fileNamePattern>
+            <MaxHistory>${max.history}</MaxHistory>
+            <totalSizeCap>${total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%cyan(%t)] [%yellow(%c)]-[%highlight(%p)] %m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC-FILE-APPENDER-WARN" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${queue.size}</queueSize>
+        <neverBlock>${never.block}</neverBlock>
+        <appender-ref ref="FILE-APPENDER-WARN"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="console"/>
+        <appender-ref ref="ASYNC-FILE-APPENDER-INFO"/>
+        <appender-ref ref="ASYNC-FILE-APPENDER-WARN"/>
+    </root>
+
+</configuration>
