@@ -43,6 +43,6 @@ public class UserForm {
         private String name;
         private String departmentCode;
         private Boolean status;
-        private List<Long> roleList;
+        private List<String> roleList;
     }
 }

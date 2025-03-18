@@ -7,16 +7,26 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wufeiqun.zeus.biz.system.entity.UserForm;
 import com.wufeiqun.zeus.biz.system.entity.UserVO;
 import com.wufeiqun.zeus.common.entity.SelectVO;
+import com.wufeiqun.zeus.common.utils.DifferenceUtil;
+import com.wufeiqun.zeus.dao.Menu;
 import com.wufeiqun.zeus.dao.User;
+import com.wufeiqun.zeus.dao.UserRoleRelation;
+import com.wufeiqun.zeus.service.IMenuService;
+import com.wufeiqun.zeus.service.IRoleMenuRelationService;
+import com.wufeiqun.zeus.service.IUserRoleRelationService;
 import com.wufeiqun.zeus.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.wufeiqun.zeus.common.constant.GlobalConstant.SUPER_ADMIN;
 
 /**
  * @author 吴飞群
@@ -27,6 +37,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserFacade {
     private final IUserService userService;
+    private final IMenuService menuService;
+    private final IUserRoleRelationService userRoleRelationService;
+    private final IRoleMenuRelationService roleMenuRelationService;
 
     /**
      * 用于用户下拉框的用户列表
@@ -100,6 +113,50 @@ public class UserFacade {
         }
         return DigestUtil.bcryptCheck(password, user.getPassword());
     }
+
+    /**
+     * 修改用户信息, 这里暂时只允许修改用户的角色, 其他信息后续会从企业微信来同步
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserRoleRelation(UserForm.UpdateUserForm form, String operator){
+        QueryWrapper<UserRoleRelation> wrapper = new QueryWrapper<>();
+        wrapper.eq("account", form.getAccount());
+        // 获取用户当前所拥有的角色编码列表
+        List<String> userExistRoleCodeList = userRoleRelationService.list(wrapper).stream()
+                .map(UserRoleRelation::getRoleCode).toList();
+        // 获取用户最新的用户角色编码列表
+        List<String> userNewRoleCodeList = form.getRoleList();
+        //本地存在, 最新请求数据不存在 为需要删除的数据
+        List<String> needDelete = DifferenceUtil.differenceObject(userExistRoleCodeList, userNewRoleCodeList);
+        //更新存在, 本地不存在 为新增数据
+        List<String> needInsert = DifferenceUtil.differenceObject(userNewRoleCodeList, userExistRoleCodeList);
+        // 删除
+        QueryWrapper<UserRoleRelation> deleteWrapper = new QueryWrapper<>();
+        deleteWrapper.eq("account", form.getAccount()).in("role_code", needDelete);
+        userRoleRelationService.remove(deleteWrapper);
+        // 新增
+        List<UserRoleRelation> list =  needInsert.stream().map((item)->{
+            UserRoleRelation relation = new UserRoleRelation();
+            relation.setAccount(form.getAccount());
+            relation.setRoleCode(item);
+            relation.setCreateUser(operator);
+            return relation;
+        }).toList();
+        userRoleRelationService.saveBatch(list);
+
+    }
+
+    /**
+     * 查询用户的权限编码, 用于前端/后端接口的校验
+     * TODO: 这里可以加缓存/删除缓存等
+     */
+    public Set<String> getUserPermissionCodeList(String account) {
+        if (SUPER_ADMIN.equals(account)){
+            return menuService.list().stream().map(Menu::getCode).collect(Collectors.toSet());
+        }
+        return userService.getUserPermissionCodeList(account);
+    }
+
 
 
 }

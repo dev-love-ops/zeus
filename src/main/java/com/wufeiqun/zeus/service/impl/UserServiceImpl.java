@@ -6,6 +6,8 @@ import com.wufeiqun.zeus.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 /**
  * <p>
  * 用户 服务实现类
@@ -17,4 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    @Override
+    public Set<String> getUserPermissionCodeList(String account) {
+        return baseMapper.getUserPermissionCodeList(account);
+    }
 }

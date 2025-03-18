@@ -26,4 +26,13 @@
         id, account, username, mobile, email, department, type, create_time, update_time, create_user, update_user, comment, status, password, work_weixin_id
     </sql>
 
+    <select id="getUserPermissionCodeList" resultType="java.lang.String">
+        SELECT
+        m.code
+        FROM user_role_relation AS urr
+        join role_menu_relation as rmr on urr.role_id = rmr.role_id
+        join menu as m on m.id=rmr.menu_id
+        WHERE urr.account=#{account, jdbcType=VARCHAR}
+    </select>
+
 </mapper>
