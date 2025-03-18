@@ -16,3 +16,7 @@ server:
       enabled: true
     threads:
       max: 500
+
+mybatis-plus:
+  check-config-location: true
+  mapper-locations: classpath:/mapper/**.xml

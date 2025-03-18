@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 1. 生成代码的时候, 每一个类型都有enableFileOverride方法, 默认是false, 所以如果生成的文件存在, 那么不会覆盖.
+ */
 public class CodeGenerator {
     public static void main(String[] args) {
         String url = "jdbc:mysql://127.0.0.1:3306/zeus?useUnicode=true&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&tinyInt1isBit=true";
@@ -50,21 +53,20 @@ public class CodeGenerator {
                         builder.addInclude(tableList) // 设置需要生成的表名
                         // 实体类配置
                         .entityBuilder()
-                        .disableSerialVersionUID() // 实体类不序列化
-                        .enableLombok()
+                            .disableSerialVersionUID() // 实体类不序列化
+                            .enableLombok() // 使用lombok代替getter/setter
+                            .enableFileOverride() // 覆盖已生成文件, 不然字段变化不会更新
                         // controller配置
                         .controllerBuilder()
-                        .disable()
+                            .disable() // 自己创建controller
                         // mapper配置
                         .mapperBuilder()
                         .enableBaseResultMap()
                         .enableBaseColumnList()
-                        .formatMapperFileName("%sMapper")
-                        .formatXmlFileName("%sMapper")
+
                         // service配置
-                        .serviceBuilder()
-                        .formatServiceFileName("%sService")
-                        .formatServiceImplFileName("%sServiceImpl")
+                        .serviceBuilder().enableFileOverride()
+
 
 
 
