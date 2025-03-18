@@ -1,6 +1,9 @@
 package com.wufeiqun.zeus.biz.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wufeiqun.zeus.biz.system.entity.UserForm;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.service.IUserService;
@@ -35,6 +38,14 @@ public class UserFacade {
             vo.setLabel(user.getUsername());
             return vo;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 用户列表, 管理页面使用
+     */
+    public IPage<User> getPageableUserList(UserForm.UserSearchForm form){
+        Page<User> pageRequest = new Page<>(form.getPageNum(), form.getPageSize());
+        return userService.page(pageRequest);
     }
 
 

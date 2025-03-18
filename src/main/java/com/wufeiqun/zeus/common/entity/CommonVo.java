@@ -32,13 +32,13 @@ public class CommonVo<T> implements Serializable {
     }
 
     public static <T> CommonVo<T> success(T data) {
-        CommonVo<T> ret = new CommonVo<T>();
+        CommonVo<T> ret = new CommonVo<>();
         ret.setData(data);
         return ret;
     }
 
     public static <T> CommonVo<T> success(T data, String message) {
-        CommonVo<T> ret = new CommonVo<T>();
+        CommonVo<T> ret = new CommonVo<>();
         ret.setData(data);
         ret.setMessage(message);
         return ret;

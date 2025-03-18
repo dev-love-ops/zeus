@@ -1,11 +1,11 @@
 package com.wufeiqun.zeus.controller.system;
 
 import com.wufeiqun.zeus.biz.system.UserFacade;
+import com.wufeiqun.zeus.biz.system.entity.UserForm;
 import com.wufeiqun.zeus.common.entity.CommonVo;
-import com.wufeiqun.zeus.common.entity.SelectVO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,10 +24,10 @@ public class UserManagementController {
         return CommonVo.success(userFacade.getSelectableUserList());
     }
 
-//    @PostMapping("/getUserList")
-//    public CommonVo<Object> getPageableUserList(@RequestBody UserForms.UserSearchForm form) {
-//        return CommonVo.success(userFacade.getPageableUserList(form));
-//    }
+    @PostMapping("/getPageableUserList")
+    public CommonVo<Object> getPageableUserList(@RequestBody UserForm.UserSearchForm form) {
+        return CommonVo.success(userFacade.getPageableUserList(form));
+    }
 //
 //    @PostMapping("/updateUserRoleRelation")
 //    public CommonVo<Object> updateUserRoleRelation(@RequestBody  @Valid UserForms.UpdateUserForm form) {
