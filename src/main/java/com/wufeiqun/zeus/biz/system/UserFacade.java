@@ -1,5 +1,6 @@
 package com.wufeiqun.zeus.biz.system;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -83,6 +85,20 @@ public class UserFacade {
         }
 
         return vo;
+    }
+
+    public User getUserByAccount(String account){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account", account);
+        return userService.getOne(queryWrapper);
+    }
+
+    public boolean validateToken(String account, String password){
+        User user = getUserByAccount(account);
+        if (Objects.isNull(user)){
+            return false;
+        }
+        return DigestUtil.bcryptCheck(password, user.getPassword());
     }
 
 

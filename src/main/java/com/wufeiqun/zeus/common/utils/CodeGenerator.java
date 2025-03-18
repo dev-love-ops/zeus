@@ -23,11 +23,11 @@ public class CodeGenerator {
         String xmlPath = "/Users/rocky/self/github/zeus/src/main/resources/mapper";
 
         // 生成所有表的代码
-        List<String> tableList = Arrays.asList("user", "role", "user_role_relation", "department", "user_favorite_application",
-        "server", "role_menu_relation", "operation_record", "menu", "environment", "cicd_restart_record", "cicd_deploy_record",
-                "cicd_build_record", "application_resource_relation", "application_deploy_config", "application");
+//        List<String> tableList = Arrays.asList("user", "role", "user_role_relation", "department", "user_favorite_application",
+//        "server", "role_menu_relation", "operation_record", "menu", "environment", "cicd_restart_record", "cicd_deploy_record",
+//                "cicd_build_record", "application_resource_relation", "application_deploy_config", "application");
 
-//        List<String> tableList = List.of("user");
+        List<String> tableList = List.of("user_role_relation");
 
         FastAutoGenerator.create(url, username, password)
                 .globalConfig(builder -> {

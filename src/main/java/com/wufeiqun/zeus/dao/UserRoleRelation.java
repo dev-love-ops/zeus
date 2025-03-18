@@ -28,9 +28,9 @@ public class UserRoleRelation {
     private Long id;
 
     /**
-     * 角色ID
+     * 角色编码
      */
-    private Long roleId;
+    private String roleCode;
 
     /**
      * 用户账号
