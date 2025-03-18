@@ -1,6 +1,6 @@
 package com.wufeiqun.zeus.service;
 
-import com.wufeiqun.zeus.entity.User;
+import com.wufeiqun.zeus.dao.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

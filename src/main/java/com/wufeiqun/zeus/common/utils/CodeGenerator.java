@@ -47,6 +47,8 @@ public class CodeGenerator {
                 .packageConfig(builder ->
                         builder.parent("com.wufeiqun") // 设置父包名
                                 .moduleName("zeus") // 设置父包模块名
+                                .entity("dao") // entity存放的包的名字
+                                .mapper("dao") // mapper存放的包的名字
                                 .pathInfo(Collections.singletonMap(OutputFile.xml, xmlPath)) // 设置mapperXml生成路径
                 )
                 .strategyConfig(builder ->
@@ -56,17 +58,13 @@ public class CodeGenerator {
                             .disableSerialVersionUID() // 实体类不序列化
                             .enableLombok() // 使用lombok代替getter/setter
                             .enableFileOverride() // 覆盖已生成文件, 不然字段变化不会更新
-                        // controller配置
-                        .controllerBuilder()
-                            .disable() // 自己创建controller
                         // mapper配置
                         .mapperBuilder()
                         .enableBaseResultMap()
                         .enableBaseColumnList()
-
-                        // service配置
-                        .serviceBuilder().enableFileOverride()
-
+                        // controller配置
+                        .controllerBuilder()
+                        .disable() // 自己创建controller
 
 
 

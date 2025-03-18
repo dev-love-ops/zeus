@@ -1,4 +1,4 @@
-package com.wufeiqun.zeus.entity;
+package com.wufeiqun.zeus.dao;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,7 +12,7 @@ import lombok.ToString;
  * </p>
  *
  * @author wufeiqun
- * @since 2025-03-17
+ * @since 2025-03-18
  */
 @Getter
 @Setter
@@ -30,7 +30,7 @@ public class User {
     /**
      * 用户姓名
      */
-    private String name;
+    private String username;
 
     /**
      * 手机号
@@ -45,7 +45,7 @@ public class User {
     /**
      * 部门编码
      */
-    private String departmentCode;
+    private String department;
 
     /**
      * 用户类型, 默认为0, 表示内部员工, 其它的备用
@@ -90,5 +90,5 @@ public class User {
     /**
      * 用户关联的企业微信ID, 用于发送通知
      */
-    private String workwxId;
+    private String workWeixinId;
 }

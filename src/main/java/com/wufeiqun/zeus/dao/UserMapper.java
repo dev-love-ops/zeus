@@ -1,6 +1,6 @@
-package com.wufeiqun.zeus.mapper;
+package com.wufeiqun.zeus.dao;
 
-import com.wufeiqun.zeus.entity.User;
+import com.wufeiqun.zeus.dao.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 
@@ -10,9 +10,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author wufeiqun
- * @since 2025-03-17
+ * @since 2025-03-18
  */
 public interface UserMapper extends BaseMapper<User> {
-    int countByName(String name);
+
 }
 
