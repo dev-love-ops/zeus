@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wufeiqun.zeus.dao.CicdBuildRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wufeiqun.zeus.dao.CicdBuildRecord">
+        <id column="id" property="id" />
+        <result column="build_app_code" property="buildAppCode" />
+        <result column="build_branch" property="buildBranch" />
+        <result column="build_env_code" property="buildEnvCode" />
+        <result column="build_time" property="buildTime" />
+        <result column="build_status" property="buildStatus" />
+        <result column="build_tag" property="buildTag" />
+        <result column="build_profile" property="buildProfile" />
+        <result column="build_target_url" property="buildTargetUrl" />
+        <result column="build_target_image_id" property="buildTargetImageId" />
+        <result column="cicd_task_id" property="cicdTaskId" />
+        <result column="cicd_task_item_id" property="cicdTaskItemId" />
+        <result column="deploy_mode" property="deployMode" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_user" property="updateUser" />
+        <result column="comment" property="comment" />
+        <result column="celery_task_id" property="celeryTaskId" />
+        <result column="build_image_url" property="buildImageUrl" />
+        <result column="ones_project" property="onesProject" />
+        <result column="ones_sprint" property="onesSprint" />
+        <result column="duration" property="duration" />
+        <result column="ones_deploy_task" property="onesDeployTask" />
+        <result column="ones_project_name" property="onesProjectName" />
+        <result column="ones_sprint_name" property="onesSprintName" />
+        <result column="ones_deploy_task_name" property="onesDeployTaskName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, build_app_code, build_branch, build_env_code, build_time, build_status, build_tag, build_profile, build_target_url, build_target_image_id, cicd_task_id, cicd_task_item_id, deploy_mode, create_time, update_time, create_user, update_user, comment, celery_task_id, build_image_url, ones_project, ones_sprint, duration, ones_deploy_task, ones_project_name, ones_sprint_name, ones_deploy_task_name
+    </sql>
+
+</mapper>

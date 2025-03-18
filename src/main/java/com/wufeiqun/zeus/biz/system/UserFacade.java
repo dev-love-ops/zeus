@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wufeiqun.zeus.biz.system.entity.UserForm;
+import com.wufeiqun.zeus.biz.system.entity.UserVO;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,9 +45,44 @@ public class UserFacade {
     /**
      * 用户列表, 管理页面使用
      */
-    public IPage<User> getPageableUserList(UserForm.UserSearchForm form){
+    public IPage<UserVO> getPageableUserList(UserForm.UserSearchForm form){
         Page<User> pageRequest = new Page<>(form.getPageNum(), form.getPageSize());
-        return userService.page(pageRequest);
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("id");
+
+        if (StringUtils.isNotBlank(form.getAccount())){
+            queryWrapper.like("account", form.getAccount());
+        }
+        if (StringUtils.isNotBlank(form.getUsername())){
+            queryWrapper.like("username", form.getUsername());
+        }
+
+        IPage<User> userPage = userService.page(pageRequest, queryWrapper);
+
+        IPage<UserVO> voPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        voPage.setRecords(
+                userPage.getRecords().stream().map(this::convertToVO).collect(Collectors.toList())
+        );
+        return voPage;
+
+    }
+
+    private UserVO convertToVO(User user){
+        UserVO vo = new UserVO();
+        vo.setAccount(user.getAccount());
+        vo.setUsername(user.getUsername());
+        vo.setStatus(user.getStatus());
+//        vo.setRoleList(user.getRoleList());
+//        vo.setRoleNameList(user.getRoleNameList());
+
+        if (user.getStatus()){
+            vo.setStatusDesc("启用");
+        } else {
+            vo.setStatusDesc("禁用");
+        }
+
+        return vo;
     }
 
 

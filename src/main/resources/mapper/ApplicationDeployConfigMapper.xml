@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wufeiqun.zeus.dao.ApplicationDeployConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wufeiqun.zeus.dao.ApplicationDeployConfig">
+        <id column="id" property="id" />
+        <result column="app_code" property="appCode" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_user" property="updateUser" />
+        <result column="git" property="git" />
+        <result column="health_check_uri" property="healthCheckUri" />
+        <result column="artifact_name" property="artifactName" />
+        <result column="artifact_type" property="artifactType" />
+        <result column="artifact_path" property="artifactPath" />
+        <result column="port" property="port" />
+        <result column="type" property="type" />
+        <result column="probe_type" property="probeType" />
+        <result column="build_extra_args" property="buildExtraArgs" />
+        <result column="env" property="env" />
+        <result column="profile" property="profile" />
+        <result column="build_branch" property="buildBranch" />
+        <result column="work_weixin_token" property="workWeixinToken" />
+        <result column="initial_delay_seconds" property="initialDelaySeconds" />
+        <result column="auto_deploy_on_git_commit" property="autoDeployOnGitCommit" />
+        <result column="runtime_version" property="runtimeVersion" />
+        <result column="containerized" property="containerized" />
+        <result column="run_extra_args" property="runExtraArgs" />
+        <result column="kubernetes_namespace" property="kubernetesNamespace" />
+        <result column="kubernetes_schedule_strategy" property="kubernetesScheduleStrategy" />
+        <result column="kubernetes_replicas" property="kubernetesReplicas" />
+        <result column="kubernetes_limit_cpu" property="kubernetesLimitCpu" />
+        <result column="kubernetes_limit_memory" property="kubernetesLimitMemory" />
+        <result column="kubernetes_node_port" property="kubernetesNodePort" />
+        <result column="prometheus_scrape" property="prometheusScrape" />
+        <result column="prometheus_path" property="prometheusPath" />
+        <result column="dockerfile_template_name" property="dockerfileTemplateName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, app_code, create_time, update_time, create_user, update_user, git, health_check_uri, artifact_name, artifact_type, artifact_path, port, type, probe_type, build_extra_args, env, profile, build_branch, work_weixin_token, initial_delay_seconds, auto_deploy_on_git_commit, runtime_version, containerized, run_extra_args, kubernetes_namespace, kubernetes_schedule_strategy, kubernetes_replicas, kubernetes_limit_cpu, kubernetes_limit_memory, kubernetes_node_port, prometheus_scrape, prometheus_path, dockerfile_template_name
+    </sql>
+
+</mapper>
