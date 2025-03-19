@@ -1,12 +1,17 @@
 package com.wufeiqun.zeus.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wufeiqun.zeus.dao.Role;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.dao.UserMapper;
 import com.wufeiqun.zeus.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -27,6 +32,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Set<Long> getUserMenuIdList(String account) {
         return baseMapper.getUserMenuIdList(account);
+    }
+
+    @Override
+    public List<Role> getUserRoleList(String account) {
+        return baseMapper.getUserRoleList(account);
+    }
+
+    @Override
+    public Map<String, User> getAccountUserMap() {
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+
+        return baseMapper.selectList(queryWrapper).stream().collect(Collectors.toMap(User::getAccount, x -> x));
+
     }
 
 }

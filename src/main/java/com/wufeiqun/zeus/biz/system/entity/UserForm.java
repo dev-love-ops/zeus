@@ -22,10 +22,8 @@ public class UserForm {
 
     @Data
     public static class ChangePasswordForm {
-        @NotNull(message = "不能为空")
+        @NotNull(message = "新密码不能为空")
         private String password;
-        @NotNull(message = "不能为空")
-        private String newPassword;
     }
 
     @Data

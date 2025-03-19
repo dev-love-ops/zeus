@@ -21,6 +21,29 @@ public class RoleForm {
     }
 
     @Data
+    public static class CreateRoleForm{
+        @NotBlank(message = "code不能为空")
+        private String code;
+        @NotBlank(message = "name不能为空")
+        private String name;
+        private String comment;
+        @NotNull(message="menuIdList不能为null")
+        private List<Long> menuIdList;
+    }
+
+    @Data
+    public static class UpdateRoleMenuForm{
+        @NotNull(message="id不能为空")
+        private Long id;
+        @NotBlank(message = "code不能为空")
+        private String code;
+        @NotBlank(message = "name不能为空")
+        private String name;
+        private String comment;
+        private List<Long> menuIdList;
+    }
+
+    @Data
     public static class DeleteRoleForm {
         @NotNull(message = "角色id不能为空")
         private Long id;

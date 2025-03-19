@@ -6,6 +6,7 @@ import com.wufeiqun.zeus.common.entity.CommonVo;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.utils.RequestUtil;
 import com.wufeiqun.zeus.dao.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -31,24 +32,24 @@ public class RoleController {
         return CommonVo.success(roleFacade.getPageableRoleList(form));
     }
 
-//    @PostMapping("/updateRoleMenuRelation")
-//    public CommonVo<Object> updateRoleMenuRelation(@RequestBody RoleForms.UpdateRoleMenuForm form) {
-//        User user = RequestUtil.getCurrentUser();
-//        roleFacade.updateRoleMenuRelation(form, user.getAccount());
-//        return CommonVo.success();
-//    }
+    @PostMapping("/updateRoleMenuRelation")
+    public CommonVo<Object> updateRoleMenuRelation(@RequestBody RoleForm.UpdateRoleMenuForm form) {
+        User user = RequestUtil.getCurrentUser();
+        roleFacade.updateRoleMenuRelation(form, user.getAccount());
+        return CommonVo.success();
+    }
 
-//    @PostMapping("/createRoleWithRoleMenuRelation")
-//    public CommonVo<Object> createRoleWithRoleMenuRelation(@RequestBody RoleForms.CreateRoleForm form) {
-//        User user = RequestUtil.getCurrentUser();
-//        roleFacade.createRoleWithRoleMenuRelation(form, user.getAccount());
-//        return CommonVo.success();
-//    }
+    @PostMapping("/createRoleWithRoleMenuRelation")
+    public CommonVo<Object> createRoleWithRoleMenuRelation(@RequestBody @Valid RoleForm.CreateRoleForm form) {
+        User user = RequestUtil.getCurrentUser();
+        roleFacade.createRoleWithRoleMenuRelation(form, user.getAccount());
+        return CommonVo.success();
+    }
 
     @PostMapping("/deleteRole")
     public CommonVo<Object> deleteRole(@RequestBody RoleForm.DeleteRoleForm form) {
-//        User user = RequestUtil.getCurrentUser();
-        roleFacade.deleteRole(form, "");
+        User user = RequestUtil.getCurrentUser();
+        roleFacade.deleteRole(form, user.getAccount());
         return CommonVo.success();
     }
 

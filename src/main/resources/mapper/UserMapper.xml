@@ -42,5 +42,11 @@
         WHERE urr.account=#{account, jdbcType=VARCHAR}
     </select>
 
+    <select id="getUserRoleList" resultMap="com.wufeiqun.zeus.dao.RoleMapper.BaseResultMap">
+        select r.* from role as r
+        join user_role_relation as urr
+        on r.id=urr.role_id and urr.account=#{account, jdbcType=VARCHAR}
+    </select>
+
 
 </mapper>

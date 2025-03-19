@@ -86,16 +86,16 @@ public class LoginStatusInterceptor implements HandlerInterceptor {
      * 会造成频繁出发登录跳转操作,其实没必要还是使用自己之前的方式
      */
     private User getUserByToken(HttpServletRequest request) {
-        User user;
+
         String token = request.getHeader("Authorization");
 
         if (StringUtils.isBlank(token)) {
             log.warn("getUserByToken, Header Authorization is null!");
             return null;
         }
-        //
-        user = useJWTMethod(token);
-        return user;
+
+        return useJWTMethod(token);
+
     }
 
     private User useJWTMethod(String token){

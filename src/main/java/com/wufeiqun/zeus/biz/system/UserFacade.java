@@ -15,6 +15,7 @@ import com.wufeiqun.zeus.biz.system.entity.UserVO;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.utils.DifferenceUtil;
 import com.wufeiqun.zeus.dao.Menu;
+import com.wufeiqun.zeus.dao.Role;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.dao.UserRoleRelation;
 import com.wufeiqun.zeus.service.IMenuService;
@@ -93,8 +94,10 @@ public class UserFacade {
         vo.setAccount(user.getAccount());
         vo.setUsername(user.getUsername());
         vo.setStatus(user.getStatus());
-//        vo.setRoleList(user.getRoleList());
-//        vo.setRoleNameList(user.getRoleNameList());
+
+        List<Role> roleList = userService.getUserRoleList(user.getAccount());
+        vo.setRoleList(roleList.stream().map(Role::getId).collect(Collectors.toList()));
+        vo.setRoleNameList(roleList.stream().map(Role::getName).collect(Collectors.toList()));
 
         if (user.getStatus()){
             vo.setStatusDesc("启用");
@@ -204,7 +207,7 @@ public class UserFacade {
         updateWrapper.eq("account", operator);
 
         User user = new User();
-        user.setPassword(DigestUtil.bcrypt(form.getNewPassword()));
+        user.setPassword(DigestUtil.bcrypt(form.getPassword()));
 
         userService.update(user, updateWrapper);
     }

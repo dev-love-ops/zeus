@@ -1,8 +1,11 @@
 package com.wufeiqun.zeus.service;
 
+import com.wufeiqun.zeus.dao.Role;
 import com.wufeiqun.zeus.dao.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,4 +19,6 @@ import java.util.Set;
 public interface IUserService extends IService<User> {
     Set<String> getUserPermissionCodeList(String account);
     Set<Long> getUserMenuIdList(String account);
+    List<Role> getUserRoleList(String account);
+    Map<String, User> getAccountUserMap();
 }
