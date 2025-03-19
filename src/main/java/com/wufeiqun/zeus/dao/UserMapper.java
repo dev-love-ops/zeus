@@ -16,5 +16,6 @@ import java.util.Set;
  */
 public interface UserMapper extends BaseMapper<User> {
     Set<String> getUserPermissionCodeList(String account);
+    Set<Long> getUserMenuIdList(String account);
 }
 

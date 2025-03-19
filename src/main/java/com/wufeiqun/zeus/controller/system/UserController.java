@@ -2,10 +2,12 @@ package com.wufeiqun.zeus.controller.system;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.wufeiqun.zeus.biz.system.UserFacade;
+import com.wufeiqun.zeus.biz.system.entity.UserForm;
 import com.wufeiqun.zeus.biz.system.entity.UserInfo;
 import com.wufeiqun.zeus.common.entity.CommonVo;
 import com.wufeiqun.zeus.common.utils.RequestUtil;
 import com.wufeiqun.zeus.dao.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +43,14 @@ public class UserController {
     @GetMapping("/getUserMenuList")
     public CommonVo<Object> getUserMenuList() {
         User user = RequestUtil.getCurrentUser();
-        return CommonVo.success();
-//        return CommonVo.success(userFacade.getUserMenuList(user.getAccount()));
+        return CommonVo.success(userFacade.getUserMenuList(user.getAccount()));
     }
 
-//    @PostMapping("/changePassword")
-//    public CommonVo<Object> login(@RequestBody @Valid UserForms.ChangePasswordForm form){
-//        User user = RequestUtil.getCurrentUser();
-//        userFacade.changePassword(form, user.getAccount());
-//        return CommonVo.success();
-//    }
+    @PostMapping("/changePassword")
+    public CommonVo<Object> changePassword(@RequestBody @Valid UserForm.ChangePasswordForm form){
+        User user = RequestUtil.getCurrentUser();
+        userFacade.changePassword(form, user.getAccount());
+        return CommonVo.success();
+    }
 
 }

@@ -34,5 +34,13 @@
         join menu as m on m.id=rmr.menu_id
         WHERE urr.account=#{account, jdbcType=VARCHAR}
     </select>
+    <select id="getUserMenuIdList" resultType="java.lang.Long">
+        SELECT
+        rmr.menu_id
+        FROM user_role_relation AS urr
+        join role_menu_relation as rmr on urr.role_id = rmr.role_id
+        WHERE urr.account=#{account, jdbcType=VARCHAR}
+    </select>
+
 
 </mapper>

@@ -23,4 +23,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Set<String> getUserPermissionCodeList(String account) {
         return baseMapper.getUserPermissionCodeList(account);
     }
+
+    @Override
+    public Set<Long> getUserMenuIdList(String account) {
+        return baseMapper.getUserMenuIdList(account);
+    }
+
 }

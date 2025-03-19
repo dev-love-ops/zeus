@@ -1,10 +1,16 @@
 package com.wufeiqun.zeus.biz.system;
 
+import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.TreeNodeConfig;
+import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wufeiqun.zeus.biz.system.entity.UserForm;
+import com.wufeiqun.zeus.biz.system.entity.UserMenuContext;
 import com.wufeiqun.zeus.biz.system.entity.UserVO;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.utils.DifferenceUtil;
@@ -21,9 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.wufeiqun.zeus.common.constant.GlobalConstant.SUPER_ADMIN;
@@ -38,6 +42,7 @@ import static com.wufeiqun.zeus.common.constant.GlobalConstant.SUPER_ADMIN;
 public class UserFacade {
     private final IUserService userService;
     private final IMenuService menuService;
+    private final MenuAdapter menuAdapter;
     private final IUserRoleRelationService userRoleRelationService;
     private final IRoleMenuRelationService roleMenuRelationService;
 
@@ -157,6 +162,51 @@ public class UserFacade {
         return userService.getUserPermissionCodeList(account);
     }
 
+    public List<Tree<String>> getUserMenuList(String account){
+        // 配置
+        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
+        treeNodeConfig.setWeightKey("sort");
+        UserMenuContext context = menuAdapter.createUserMenuContext(account);
 
+        //转换器
+        List<Tree<String>> ret = TreeUtil.build(context.getMenuList(), "0", treeNodeConfig, (treeNode, tree) -> {
+            tree.setId(String.valueOf(treeNode.getId()));
+            tree.setParentId(String.valueOf(treeNode.getParentId()));
+            tree.setName(treeNode.getCode());
+            // 扩展属性
+            tree.putExtra("path", treeNode.getPath());
+            tree.putExtra("component", treeNode.getComponent());
+            if (StringUtils.isNotEmpty(treeNode.getRedirect())){
+                tree.putExtra("redirect", treeNode.getRedirect());
+            }
+            Map<String, Object> meta = new HashMap<>();
+            meta.put("title", treeNode.getTabName());
+            if (StringUtils.isNotEmpty(treeNode.getIcon())){
+                meta.put("icon", treeNode.getIcon());
+            }
+            if (treeNode.getHide() == 1){
+                meta.put("hideMenu", true);
+                meta.put("currentActiveMenu", treeNode.getCurrentActiveMenu());
+            }
+            tree.putExtra("sort", treeNode.getSort());
+            tree.put("meta", meta);
+        });
+
+        if (Objects.isNull(ret)){
+            return Collections.emptyList();
+        }
+
+        return ret;
+    }
+
+    public void changePassword(UserForm.ChangePasswordForm form, String operator){
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("account", operator);
+
+        User user = new User();
+        user.setPassword(DigestUtil.bcrypt(form.getNewPassword()));
+
+        userService.update(user, updateWrapper);
+    }
 
 }

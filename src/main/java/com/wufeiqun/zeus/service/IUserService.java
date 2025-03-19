@@ -15,4 +15,5 @@ import java.util.Set;
  */
 public interface IUserService extends IService<User> {
     Set<String> getUserPermissionCodeList(String account);
+    Set<Long> getUserMenuIdList(String account);
 }
