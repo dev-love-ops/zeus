@@ -31,4 +31,9 @@
         id, parent_id, type, name, code, full_path, hide, path, url, method, icon, sort, tab_name, component, redirect, create_time, update_time, create_user, update_user, current_active_menu
     </sql>
 
+    <select id="getMenuRoleList" resultMap="com.wufeiqun.zeus.dao.RoleMapper.BaseResultMap">
+        select r.* from role as r join role_menu_relation as rmr
+        on r.id=rmr.role_id and rmr.menu_id=#{menuId, jdbcType=BIGINT}
+    </select>
+
 </mapper>

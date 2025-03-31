@@ -3,6 +3,8 @@ package com.wufeiqun.zeus.dao;
 import com.wufeiqun.zeus.dao.Menu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 
 /**
  * <p>
@@ -13,6 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2025-03-18
  */
 public interface MenuMapper extends BaseMapper<Menu> {
-
+    List<Role> getMenuRoleList(Long menuId);
 }
 

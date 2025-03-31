@@ -42,9 +42,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Map<String, User> getAccountUserMap() {
 
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-
-        return baseMapper.selectList(queryWrapper).stream().collect(Collectors.toMap(User::getAccount, x -> x));
+        return this.list().stream().collect(Collectors.toMap(User::getAccount, x -> x));
 
     }
 
