@@ -38,15 +38,15 @@ public class ApplicationConfigForm {
         /**
          * 制品名称, 比如 `pharmcube-invest.jar`
          */
-        private String pkgName;
+        private String artifactName;
         /**
          * 制品类型, 不同制品类型会走不同的构建发布逻辑
          */
-        private String pkgType;
+        private String artifactType;
         /**
          * 制品相对路径, 比如SpringBoot项目一般为 `/xxx/targets`
          */
-        private String pkgPath;
+        private String artifactPath;
         /**
          * 探活方式
          */
@@ -55,10 +55,7 @@ public class ApplicationConfigForm {
          * 探活接口URI, 只有在探活方式为HTTP的时候生效
          */
         private String healthCheckUri;
-        /**
-         * 发布完成是否合并master主分支
-         */
-        private Boolean mergeMaster;
+
         /**
          * 企业微信机器人, 用于通知
          */
@@ -81,22 +78,14 @@ public class ApplicationConfigForm {
          * 是否容器化, 只有开启容器化, 容器相关的功能才会执行, 比如构建docker镜像等
          */
         private Boolean containerized;
-        /**
-         * 是否锁定发布分支
-         */
-        private Boolean lockDeployBranch;
     }
 
     @Data
     public static class ApplicationDeployConfigByEnv {
         /**
-         * 项目的HTTP端口, 探活方式为接口探活的时候会用到, 同时也会作为其它地方的使用
+         * port
          */
-        private Integer httpPort;
-        /**
-         * 项目的RPC端口, 探活方式为TCP的时候会用到, 同时也会作为其它地方的使用
-         */
-        private Integer rpcPort;
+        private Integer port;
         /**
          * 编译参数
          */
@@ -110,17 +99,9 @@ public class ApplicationConfigForm {
          */
         private List<String> loadType;
         /**
-         * 部署前执行的脚本, 一般会提前放到服务器该应用的目录中
-         */
-        private String preScript;
-        /**
-         * 部署后执行的脚本, 一般会提前放到服务器该应用的目录中
-         */
-        private String postScript;
-        /**
          * 激活的profile, 比如 mvn -P {profile}
          */
-        private String buildActiveProfile;
+        private String profile;
         /**
          * 程序运行的额外参数. 目前容器化生成Dockerfile会用到
          */
@@ -131,7 +112,7 @@ public class ApplicationConfigForm {
          */
         private String dockerfileTemplateName;
         private Integer kubernetesReplicas;
-        private Float kubernetesLimitCpu;
+        private Integer kubernetesLimitCpu;
         private Integer kubernetesLimitMemory;
         private Integer kubernetesNodePort;
         private String kubernetesScheduleStrategy;

@@ -1,6 +1,8 @@
 package com.wufeiqun.zeus.biz.cmdb;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.wufeiqun.zeus.biz.cicd.enums.ArtifactTypeEnum;
+import com.wufeiqun.zeus.biz.cicd.enums.ServiceProbeTypeEnum;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationConfigForm;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
 import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.wufeiqun.zeus.common.constant.GlobalConstant.CMDB_APPCODE_PREFIX;
 
 
 /**
@@ -79,57 +83,42 @@ public class ApplicationAdapter {
         if (Objects.nonNull(form.getTest())){
             list.add(applicationDeployConfigConverter(form.getAppCode(), EnvironmentEnum.TEST.getCode(), form.getCommon(), form.getTest()));
         }
-        // 开发环境
-        if (Objects.nonNull(form.getDev())){
-            list.add(applicationDeployConfigConverter(form.getAppCode(), EnvironmentEnum.DEV.getCode(), form.getCommon(), form.getDev()));
-        }
-        // 灰度环境
-        if (Objects.nonNull(form.getGray())){
-            list.add(applicationDeployConfigConverter(form.getAppCode(), EnvironmentEnum.GRAY.getCode(), form.getCommon(), form.getGray()));
-        }
+
 
         return list;
     }
 
     private ApplicationDeployConfig applicationDeployConfigConverter(String appCode, String env,
-        ApplicationConfigForms.ApplicationDeployConfigCommon common, ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv){
+        ApplicationConfigForm.ApplicationDeployConfigCommon common, ApplicationConfigForm.ApplicationDeployConfigByEnv byEnv){
 
         ApplicationDeployConfig config = new ApplicationDeployConfig();
         // --------------------------通用配置--------------------------
         config.setAppCode(appCode);
         config.setEnv(env);
-        config.setPkgType(common.getPkgType());
+        config.setArtifactType(common.getArtifactType());
         config.setGit(common.getGit().trim());
-        config.setPkgName(common.getPkgName().trim());
-        config.setPkgPath(common.getPkgPath().trim());
+        config.setArtifactName(common.getArtifactName().trim());
+        config.setArtifactPath(common.getArtifactPath().trim());
         // 没有探活方式的应用类型
-        if (CicdBuildPkgTypeEnum.JARAPI.getType().equals(common.getPkgType())
-                || CicdBuildPkgTypeEnum.STATICFE.getType().equals(common.getPkgType())
-                || CicdBuildPkgTypeEnum.SCRAPY.getType().equals(common.getPkgType())
+        if (ArtifactTypeEnum.JARAPI.getType().equals(common.getArtifactType())
+                || ArtifactTypeEnum.STATICFE.getType().equals(common.getArtifactType())
         ){
-            config.setProbeType(AppProbeTypeEnum.NONE.getType());
+            config.setProbeType(ServiceProbeTypeEnum.NONE.getType());
         }else {
             config.setProbeType(common.getProbeType());
         }
         config.setHealthCheckUri(common.getHealthCheckUri());
-        config.setMergeMaster(!Objects.isNull(common.getMergeMaster()) && common.getMergeMaster());
         config.setWorkWeixinToken(common.getWorkWeixinToken());
         config.setInitialDelaySeconds(common.getInitialDelaySeconds());
-        config.setAutoDeployOnGitCommit(common.getAutoDeployOnGitCommit());
+//        config.setAutoDeployOnGitCommit(common.getAutoDeployOnGitCommit());
         config.setRuntimeVersion(common.getRuntimeVersion());
-        config.setContainerized(common.getContainerized());
-        config.setLockDeployBranch(common.getLockDeployBranch());
+//        config.setContainerized(common.getContainerized());
 
         // 单环境配置
-        config.setHttpPort(byEnv.getHttpPort());
-        config.setRpcPort(byEnv.getRpcPort());
+        config.setPort(byEnv.getPort());
         config.setBuildExtraArgs(byEnv.getBuildExtraArgs());
         config.setBuildBranch(byEnv.getBuildBranch());
-        String loadType = CollectionUtil.isEmpty(byEnv.getLoadType()) ? StringUtils.EMPTY : String.join("|" , byEnv.getLoadType());
-        config.setLoadType(loadType);
-        config.setPreScript(byEnv.getPreScript());
-        config.setPostScript(byEnv.getPostScript());
-        config.setBuildActiveProfile(byEnv.getBuildActiveProfile());
+        config.setProfile(byEnv.getProfile());
         config.setRunExtraArgs(byEnv.getRunExtraArgs());
         config.setKubernetesNamespace(byEnv.getKubernetesNamespace());
         config.setDockerfileTemplateName(byEnv.getDockerfileTemplateName());
@@ -154,8 +143,8 @@ public class ApplicationAdapter {
             throw new ServiceException("请填写正确的git地址(git协议地址, 不是HTTPS地址)");
         }
         // 校验制品路径
-        if (StringUtils.isNotBlank(form.getCommon().getPkgPath())){
-            if (form.getCommon().getPkgPath().startsWith("/") || form.getCommon().getPkgPath().endsWith("/")){
+        if (StringUtils.isNotBlank(form.getCommon().getArtifactPath())){
+            if (form.getCommon().getArtifactPath().startsWith("/") || form.getCommon().getArtifactPath().endsWith("/")){
                 throw new ServiceException("请移除制品路径开头和结尾的斜杠");
             }
         }
@@ -179,12 +168,6 @@ public class ApplicationAdapter {
             if (form.getPre().getKubernetesLimitMemory() > 5120){
                 throw new ServiceException("预发环境内存最大允许5120M");
             }
-            if (form.getGray().getKubernetesLimitCpu() > 2.0){
-                throw new ServiceException("灰度环境CPU最大允许2核心");
-            }
-            if (form.getGray().getKubernetesLimitMemory() > 5120){
-                throw new ServiceException("灰度环境内存最大允许5120M");
-            }
             if (form.getProd().getKubernetesLimitCpu() < 2.0 || form.getProd().getKubernetesLimitCpu() > 4.0){
                 throw new ServiceException("生产环境CPU核心数范围为[2,4]");
             }
@@ -193,26 +176,22 @@ public class ApplicationAdapter {
             }
 
             //副本数的限制
-            if (form.getTest().getKubernetesReplicas() > 1 || form.getPre().getKubernetesReplicas() > 1 || form.getGray().getKubernetesReplicas() > 1){
+            if (form.getTest().getKubernetesReplicas() > 1 || form.getPre().getKubernetesReplicas() > 1 ){
                 throw new ServiceException("测试环境/预发环境/灰度环境的副本数只能为0或1个");
             }
             if (form.getProd().getKubernetesReplicas() > 4 || form.getProd().getKubernetesReplicas() < 2){
                 throw new ServiceException("生产环境的副本数范围[2-4]");
             }
 
-            ApplicationDeployConfig testConfig = applicationDeployConfigService.getByAppCodeAndEnv(form.getAppCode(), EnvironmentEnum.TEST.getCode());
-            ApplicationDeployConfig preConfig = applicationDeployConfigService.getByAppCodeAndEnv(form.getAppCode(), EnvironmentEnum.PRE.getCode());
-            ApplicationDeployConfig grayConfig = applicationDeployConfigService.getByAppCodeAndEnv(form.getAppCode(), EnvironmentEnum.GRAY.getCode());
-            ApplicationDeployConfig prodConfig = applicationDeployConfigService.getByAppCodeAndEnv(form.getAppCode(), EnvironmentEnum.PROD.getCode());
+            ApplicationDeployConfig testConfig = applicationDeployConfigService.getByAppcodeAndEnvCode(form.getAppCode(), EnvironmentEnum.TEST.getCode());
+            ApplicationDeployConfig preConfig = applicationDeployConfigService.getByAppcodeAndEnvCode(form.getAppCode(), EnvironmentEnum.PRE.getCode());
+            ApplicationDeployConfig prodConfig = applicationDeployConfigService.getByAppcodeAndEnvCode(form.getAppCode(), EnvironmentEnum.PROD.getCode());
             // nodePort不允许修改, nodePort如果被其它的服务用到的话, 修改会有问题, 所以这里一旦设置就不允许修改了
             if (testConfig.getKubernetesNodePort() != 0){
                 form.getTest().setKubernetesNodePort(null);
             }
             if (preConfig.getKubernetesNodePort() != 0){
                 form.getPre().setKubernetesNodePort(null);
-            }
-            if (grayConfig.getKubernetesNodePort() != 0){
-                form.getGray().setKubernetesNodePort(null);
             }
             if (prodConfig.getKubernetesNodePort() != 0){
                 form.getProd().setKubernetesNodePort(null);
@@ -221,14 +200,8 @@ public class ApplicationAdapter {
             // 命名空间必须配置, 不然就会发送到default命名空间了
             // 应用绑定命名空间(namespace)以后就不允许修改了, 修改会有问题
             if (StringUtils.isEmpty(form.getProd().getKubernetesNamespace()) || StringUtils.isEmpty(form.getPre().getKubernetesNamespace())
-                    || StringUtils.isEmpty(form.getTest().getKubernetesNamespace()) || StringUtils.isEmpty(form.getGray().getKubernetesNamespace())){
+                    || StringUtils.isEmpty(form.getTest().getKubernetesNamespace()) ){
                 throw new ServiceException("开启容器化以后, 命名空间必须配置(测试/预发/灰度/生产)");
-            }
-
-            if (!PreNamespaceEnum.DEFAULT.getNamespace().equals(form.getPre().getKubernetesNamespace())
-                    || !GrayNamespaceEnum.DEFAULT.getNamespace().equals(form.getGray().getKubernetesNamespace())
-                    || !TestNamespaceEnum.DEFAULT.getNamespace().equals(form.getTest().getKubernetesNamespace())){
-                throw new ServiceException("命名空间配置异常(测试/预发/灰度)");
             }
 
             if (StringUtils.isNotEmpty(testConfig.getKubernetesNamespace())){
@@ -237,9 +210,7 @@ public class ApplicationAdapter {
             if (StringUtils.isNotEmpty(preConfig.getKubernetesNamespace())){
                 form.getPre().setKubernetesNamespace(null);
             }
-            if (StringUtils.isNotEmpty(grayConfig.getKubernetesNamespace())){
-                form.getGray().setKubernetesNamespace(null);
-            }
+
             if (StringUtils.isNotEmpty(prodConfig.getKubernetesNamespace())){
                 form.getProd().setKubernetesNamespace(null);
             }
@@ -247,12 +218,6 @@ public class ApplicationAdapter {
         }
         // ----------------------------容器化相关的校验结束-------------------
 
-        // 锁定发布分支校验, 如果锁定发布分支功能开启的时候, 各个环境的分支必须填写
-        if (form.getCommon().getLockDeployBranch()){
-            if (StringUtils.isEmpty(form.getTest().getBuildBranch()) || StringUtils.isEmpty(form.getPre().getBuildBranch()) || StringUtils.isEmpty(form.getProd().getBuildBranch())){
-                throw new ServiceException("<锁定发布分支>开启的时候, 各个环境的<部署分支>选项必须配置!");
-            }
-        }
 
     }
 

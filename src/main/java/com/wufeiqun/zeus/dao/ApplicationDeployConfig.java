@@ -13,7 +13,7 @@ import lombok.ToString;
  * </p>
  *
  * @author wufeiqun
- * @since 2025-03-18
+ * @since 2025-04-03
  */
 @Getter
 @Setter
@@ -122,7 +122,7 @@ public class ApplicationDeployConfig {
     /**
      * git提交后自动发布
      */
-    private Byte autoDeployOnGitCommit;
+    private Boolean autoDeployOnGitCommit;
 
     /**
      * 运行时版本号, 包括构建和运行
@@ -132,7 +132,7 @@ public class ApplicationDeployConfig {
     /**
      * 是否已经容器化
      */
-    private Byte containerized;
+    private Boolean containerized;
 
     /**
      * 程序启动额外参数
@@ -157,7 +157,7 @@ public class ApplicationDeployConfig {
     /**
      * CPU限制
      */
-    private Double kubernetesLimitCpu;
+    private Integer kubernetesLimitCpu;
 
     /**
      * 内存限制, 单位MI
@@ -172,7 +172,7 @@ public class ApplicationDeployConfig {
     /**
      * 是否开启prometheus抓取(容器专用), 默认不开启
      */
-    private Byte prometheusScrape;
+    private Boolean prometheusScrape;
 
     /**
      * prometheus抓取路径, 默认为/actuator/prometheus

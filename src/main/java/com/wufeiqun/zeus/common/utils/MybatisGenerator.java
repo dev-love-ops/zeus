@@ -6,14 +6,13 @@ import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 
 import java.sql.Types;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * 1. 生成代码的时候, 每一个类型都有enableFileOverride方法, 默认是false, 所以如果生成的文件存在, 那么不会覆盖.
  */
-public class CodeGenerator {
+public class MybatisGenerator {
     public static void main(String[] args) {
         String url = "jdbc:mysql://127.0.0.1:3306/zeus?useUnicode=true&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&tinyInt1isBit=true";
         String username = "root";
@@ -27,7 +26,7 @@ public class CodeGenerator {
 //        "server", "role_menu_relation", "operation_record", "menu", "environment", "cicd_restart_record", "cicd_deploy_record",
 //                "cicd_build_record", "application_resource_relation", "application_deploy_config", "application");
 
-        List<String> tableList = List.of("user_role_relation");
+        List<String> tableList = List.of("application_deploy_config");
 
         FastAutoGenerator.create(url, username, password)
                 .globalConfig(builder -> {
@@ -37,10 +36,11 @@ public class CodeGenerator {
                 .dataSourceConfig(builder ->
                         builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
                             int typeCode = metaInfo.getJdbcType().TYPE_CODE;
-                            if (typeCode == Types.SMALLINT) {
+                            if (typeCode == Types.TINYINT) {
                                 // 自定义类型转换
-                                return DbColumnType.INTEGER;
+                                return DbColumnType.BOOLEAN;
                             }
+
                             return typeRegistry.getColumnType(metaInfo);
                         })
                 )
