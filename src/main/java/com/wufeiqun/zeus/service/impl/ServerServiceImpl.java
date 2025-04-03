@@ -6,6 +6,10 @@ import com.wufeiqun.zeus.service.IServerService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
+
 /**
  * <p>
  * 服务器 服务实现类
@@ -17,4 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServerServiceImpl extends ServiceImpl<ServerMapper, Server> implements IServerService {
 
+    @Override
+    public Map<String, Server> getServerMap() {
+        return this.list().stream().collect(toMap(Server::getInstanceId, item -> item));
+    }
 }

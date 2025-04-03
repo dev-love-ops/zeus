@@ -55,17 +55,13 @@ public class ApplicationController {
         return CommonVo.success();
     }
 
-    @PostMapping("/getApplicationDetailByCode")
-    public CommonVo<Object> getApplicationDetailByCode(@RequestBody @Valid ApplicationForm.ApplicationQueryForm form){
-        return CommonVo.success(applicationFacade.getApplicationDetailByCode(form));
-    }
-
     @PostMapping("/favoriteApplication/{appCode}")
     public CommonVo<Object> favoriteApplication(@PathVariable String appCode){
         User user = RequestUtil.getCurrentUser();
         applicationFacade.processMyFavoriteApplication(appCode, user.getAccount(), true);
         return CommonVo.success();
     }
+
     @PostMapping("/cancelFavoriteApplication/{appCode}")
     public CommonVo<Object> cancelFavoriteApplication(@PathVariable String appCode){
         User user = RequestUtil.getCurrentUser();

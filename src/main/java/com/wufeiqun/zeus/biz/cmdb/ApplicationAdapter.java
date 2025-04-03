@@ -1,6 +1,10 @@
 package com.wufeiqun.zeus.biz.cmdb;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
+import com.wufeiqun.zeus.common.entity.SelectVO;
+import com.wufeiqun.zeus.dao.ApplicationResourceRelation;
+import com.wufeiqun.zeus.dao.Server;
 import com.wufeiqun.zeus.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,58 +40,10 @@ public class ApplicationAdapter {
      * @param list 应用资源关系列表
      *
      */
-    public List<ApplicationVOs.ApplicationResourceBase> transformApplicationServer(List<ApplicationResourceRelation> list, String appCode, String envCode){
-        ServerExample example = new ServerExample();
-        example.createCriteria().andStatusEqualTo(StatusEnum.ENABLED.getCode());
-        Map<String, Server> serverMap = serverService.getInstanceIdToServerMap(example);
-
-        List<ApplicationVOs.ApplicationResourceBase> retList = new ArrayList<>();
-
-        for (ApplicationResourceRelation item : list){
-            if (!serverMap.containsKey(item.getResourceId())){
-                continue;
-            }
-            ApplicationVOs.ApplicationResourceBase vo = new ApplicationVOs.ApplicationResourceBase();
-
-            vo.setInstanceId(item.getResourceId());
-            Server server = serverMap.get(item.getResourceId());
-            vo.setInstanceName(Objects.isNull(server) ? item.getResourceId() : server.getInstanceName());
-            String ip = Objects.isNull(server) ? StringUtils.EMPTY : MessageFormat.format("{0}({1})", server.getPrivateIp(), server.getPublicIp());
-            vo.setIp(ip);
-            vo.setPrivateIp(server.getPrivateIp());
-            vo.setComment(server.getComment());
-            vo.setCreateTime(server.getCreateTime());
-
-            retList.add(vo);
-        }
-        return retList;
-    }
-
-    public List<SelectVO> transformSelectableApplicationResource(List<ApplicationResourceRelation> list, String resourceType){
-        Map<String, Server> serverMap = serverService.getInstanceIdToServerMap(null);
-        List<SelectVO> voList = new ArrayList<>();
-
-        for (ApplicationResourceRelation item: list) {
-            SelectVO vo = new SelectVO();
-
-            if (resourceType.equals(ResourceTypeEnum.SERVER.name())){
-                Server server = serverMap.get(item.getResourceId());
-                if (Objects.nonNull(server) && server.getStatus() != 0){
-                    // 发布到虚拟机的时候, IP是前端传过来的, 一般是内网
-                    String ip = server.getPrivateIp();
-                    String label = MessageFormat.format("{0}({1})", server.getInstanceName(), ip);
-                    vo.setValue(ip);
-                    vo.setLabel(label);
-                    voList.add(vo);
-                }
-            }
-        }
-        
-        return voList;
-    }
 
 
-    public List<ApplicationResourceRelation> convertToApplicationResourceRelation(ApplicationForms.ApplicationResourceCreateOrDeleteForm form, String operator){
+
+    public List<ApplicationResourceRelation> convertToApplicationResourceRelation(ApplicationForm.ApplicationResourceCreateOrDeleteForm form, String operator){
 
         return form.getInstanceIdList().stream().map(item -> {
             ApplicationResourceRelation arr = new ApplicationResourceRelation();

@@ -9,7 +9,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
+import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationResourceVO;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationVO;
+import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
+import com.wufeiqun.zeus.biz.cmdb.enums.ResourceTypeEnum;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.exception.ServiceException;
 import com.wufeiqun.zeus.common.utils.AsyncUtil;
@@ -25,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +54,7 @@ public class ApplicationFacade {
     private final WorkWechatSender workWechatSender;
     private final IUserService userService;
     private final IDepartmentService departmentService;
+    private final IServerService serverService;
 
 
     // -----------------------应用相关的操作-------------------------------
@@ -70,7 +75,6 @@ public class ApplicationFacade {
 
         applicationService.save(application);
     }
-
 
     public void updateApplication(ApplicationForm.ApplicationUpdateForm form, String operator){
         if (permissionUtil.noPermission(operator, "cmdb:application:edit")){
@@ -146,7 +150,6 @@ public class ApplicationFacade {
         }).collect(Collectors.toList());
     }
 
-
     /**
      * 创建/取消用户收藏的应用
      */
@@ -173,59 +176,135 @@ public class ApplicationFacade {
 
     // -----------------------应用资源关系相关的操作-------------------------------
 
-    public List<SelectVO> getSelectableApplicationResourceList(ApplicationForms.ApplicationResourceQueryForm form){
-        List<ApplicationResourceRelation> list = applicationResourceRelationService.getApplicationResourceList(form.getAppCode(), form.getEnv(), form.getResourceType());
-        return applicationAdapter.transformSelectableApplicationResource(list, form.getResourceType());
-    }
-
-    public PageInfo getPageableApplicationResourceList(ApplicationForms.ApplicationResourceQueryForm form){
-        PageHelper.startPage(form.getPageNum(), form.getPageSize());
-        List<ApplicationResourceRelation> list = applicationResourceRelationService.getApplicationResourceList(form.getAppCode(), form.getEnv(), form.getResourceType());
-        PageInfo page = new PageInfo<>(list);
-        if(ResourceTypeEnum.SERVER.name().equals(form.getResourceType())){
-            page.setList(applicationAdapter.transformApplicationServer(list, form.getAppCode(), form.getEnv()));
+    public List<SelectVO> getSelectableApplicationResourceList(ApplicationForm.ApplicationResourceQueryForm form){
+        QueryWrapper<ApplicationResourceRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_code", form.getAppCode());
+        queryWrapper.eq("env", form.getEnv());
+        if (StringUtils.isNotBlank(form.getResourceType())){
+            queryWrapper.eq("resource_type", form.getResourceType());
         }
-        return page;
+        List<ApplicationResourceRelation> list = applicationResourceRelationService.list(queryWrapper);
+        return transformSelectableApplicationResource(list, form.getResourceType());
     }
 
-    public Integer createApplicationResourceRelation(ApplicationForms.ApplicationResourceCreateOrDeleteForm form, String operator){
+    private List<SelectVO> transformSelectableApplicationResource(List<ApplicationResourceRelation> list, String resourceType){
+        Map<String, Server> serverMap = serverService.getServerMap();
+        List<SelectVO> voList = new ArrayList<>();
+
+        for (ApplicationResourceRelation item: list) {
+            SelectVO vo = new SelectVO();
+
+            if (resourceType.equals(ResourceTypeEnum.SERVER.name())){
+                Server server = serverMap.get(item.getResourceId());
+                if (Objects.nonNull(server) && server.getStatus() != 0){
+                    // 发布到虚拟机的时候, IP是前端传过来的, 一般是内网
+                    String ip = server.getPrivateIp();
+                    String label = MessageFormat.format("{0}({1})", server.getInstanceName(), ip);
+                    vo.setValue(ip);
+                    vo.setLabel(label);
+                    voList.add(vo);
+                }
+            }
+        }
+
+        return voList;
+    }
+
+
+    public IPage<ApplicationResourceVO> getPageableApplicationResourceList(ApplicationForm.ApplicationResourceQueryForm form){
+
+        Page<ApplicationResourceRelation> pageRequest = new Page<>(form.getPageNum(), form.getPageSize());
+
+        QueryWrapper<ApplicationResourceRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_code", form.getAppCode());
+        queryWrapper.eq("env", form.getEnv());
+        if (StringUtils.isNotBlank(form.getResourceType())){
+            queryWrapper.eq("resource_type", form.getResourceType());
+        }
+        IPage<ApplicationResourceRelation> page = applicationResourceRelationService.page(pageRequest, queryWrapper);
+
+        IPage<ApplicationResourceVO> voPage = new Page<>(pageRequest.getCurrent(), pageRequest.getSize(), pageRequest.getTotal());
+
+        if(ResourceTypeEnum.SERVER.name().equals(form.getResourceType())){
+            voPage.setRecords(transformApplicationServer(page.getRecords()));
+        }
+
+        return voPage;
+    }
+
+    public List<ApplicationResourceVO> transformApplicationServer(List<ApplicationResourceRelation> list){
+
+        Map<String, Server> serverMap = serverService.getServerMap();
+
+        List<ApplicationResourceVO> retList = new ArrayList<>();
+
+        for (ApplicationResourceRelation item : list){
+            Server server = serverMap.get(item.getResourceId());
+
+            if (Objects.isNull(serverMap.get(item.getResourceId()))){
+                continue;
+            }
+
+            ApplicationResourceVO vo = new ApplicationResourceVO();
+
+            vo.setInstanceId(item.getResourceId());
+
+            vo.setInstanceName(server.getInstanceName());
+            String ip = MessageFormat.format("{0}({1})", server.getPrivateIp(), server.getPublicIp());
+            vo.setIp(ip);
+            vo.setPrivateIp(server.getPrivateIp());
+            vo.setComment(server.getComment());
+            vo.setCreateTime(server.getCreateTime());
+
+            retList.add(vo);
+        }
+        return retList;
+    }
+
+
+    public void createApplicationResourceRelation(ApplicationForm.ApplicationResourceCreateOrDeleteForm form, String operator){
         if (permissionUtil.noPermission(operator, "cmdb:application:resource:server:edit")){
             throw new ServiceException("用户无权限: cmdb:application:resource:server:edit");
         }
         List<ApplicationResourceRelation> list = applicationAdapter.convertToApplicationResourceRelation(form, operator);
-        return applicationResourceRelationService.batchCreate(list);
+        applicationResourceRelationService.saveBatch(list);
     }
 
     /**
-     * 删除应用绑定资源关系, 一般删除的动作比较少, 这里就直接循环删除了
+     * 删除应用绑定资源关系
      */
-    public Integer deleteApplicationResourceRelation(ApplicationForms.ApplicationResourceCreateOrDeleteForm form, String operator){
+    public void deleteApplicationResourceRelation(ApplicationForm.ApplicationResourceCreateOrDeleteForm form, String operator){
         if (permissionUtil.noPermission(operator, "cmdb:application:resource:server:edit")){
             throw new ServiceException("用户无权限: cmdb:application:resource:server:edit");
         }
         List<ApplicationResourceRelation> list = applicationAdapter.convertToApplicationResourceRelation(form, operator);
-        int count = 0;
-        for (ApplicationResourceRelation applicationResourceRelation : list) {
-            count += applicationResourceRelationService.delete(applicationResourceRelation);
-        }
-        return count;
-    }
 
+        QueryWrapper<ApplicationResourceRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_code", form.getAppCode());
+        queryWrapper.eq("env", form.getEnv());
+        queryWrapper.eq("resource_type", form.getResourceType());
+        queryWrapper.in("resource_id", form.getInstanceIdList());
+
+        applicationResourceRelationService.remove(queryWrapper);
+
+        log.info("用户[{}]删除应用[{}]的资源关系, 资源类型: {}, 环境: {}, 资源ID: {}", operator, form.getAppCode(),
+                form.getResourceType(), form.getEnv(), JSON.toJSONString(form.getInstanceIdList()));
+    }
 
 
     // -----------------------应用发布配置相关的操作-------------------------------
 
     private void createApplicationDeployConfig(String appCode){
-        for (EnvironmentEnum env : EnvironmentEnum.values()) {
-            ApplicationDeployConfig config = new ApplicationDeployConfig();
+
+        applicationDeployConfigService.saveBatch(Arrays.stream(EnvironmentEnum.values()).map(env -> { ApplicationDeployConfig config = new ApplicationDeployConfig();
             config.setAppCode(appCode);
             config.setEnv(env.getCode());
-            applicationDeployConfigService.create(config);
-        }
+        return config;}).toList());
+
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateApplicationDeployConfig(ApplicationConfigForms.ApplicationDeployConfigForm form, String operator){
+    public void updateApplicationDeployConfig(ApplicationConfigForm.ApplicationDeployConfigForm form, String operator){
         // 权限校验
         if (permissionUtil.noPermission(operator, "cmdb:application:cicd:config:edit")){
             throw new ServiceException("用户无权限: cmdb:application:cicd:config:edit");
