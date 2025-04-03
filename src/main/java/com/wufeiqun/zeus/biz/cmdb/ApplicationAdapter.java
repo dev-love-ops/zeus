@@ -1,8 +1,12 @@
 package com.wufeiqun.zeus.biz.cmdb;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationConfigForm;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
+import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
 import com.wufeiqun.zeus.common.entity.SelectVO;
+import com.wufeiqun.zeus.common.exception.ServiceException;
+import com.wufeiqun.zeus.dao.ApplicationDeployConfig;
 import com.wufeiqun.zeus.dao.ApplicationResourceRelation;
 import com.wufeiqun.zeus.dao.Server;
 import com.wufeiqun.zeus.service.*;
@@ -37,7 +41,8 @@ public class ApplicationAdapter {
 
 
     /**
-     * @param list 应用资源关系列表
+     *
+     *
      *
      */
 
@@ -58,7 +63,7 @@ public class ApplicationAdapter {
         }).collect(Collectors.toList());
     }
 
-    public List<ApplicationDeployConfig> convertToApplicationDeployConfig(ApplicationConfigForms.ApplicationDeployConfigForm form){
+    public List<ApplicationDeployConfig> convertToApplicationDeployConfig(ApplicationConfigForm.ApplicationDeployConfigForm form){
         // 参数校验
         applicationDeployConfigValidator(form);
         List<ApplicationDeployConfig> list = new ArrayList<>();
@@ -142,7 +147,7 @@ public class ApplicationAdapter {
     /**
      * 应用发布配置变更校验
      */
-    private void applicationDeployConfigValidator(ApplicationConfigForms.ApplicationDeployConfigForm form){
+    private void applicationDeployConfigValidator(ApplicationConfigForm.ApplicationDeployConfigForm form){
         // 校验gitlab地址合法性, 填写git协议的地址而不是HTTPS协议的地址
         if (!form.getCommon().getGit().startsWith("git")){
             log.warn("ApplicationAdapter.applicationDeployConfigValidator: " + form.getCommon().getGit());

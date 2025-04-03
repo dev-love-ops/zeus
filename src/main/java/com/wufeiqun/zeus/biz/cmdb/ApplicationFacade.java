@@ -8,11 +8,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
-import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationResourceVO;
-import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationVO;
+import com.wufeiqun.zeus.biz.cmdb.entity.*;
 import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
 import com.wufeiqun.zeus.biz.cmdb.enums.ResourceTypeEnum;
+import com.wufeiqun.zeus.biz.system.enums.OperationTypeEnum;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.exception.ServiceException;
 import com.wufeiqun.zeus.common.utils.AsyncUtil;
@@ -32,7 +31,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Nodes.collect;
+import static com.wufeiqun.zeus.common.constant.GlobalConstant.ZEUS_WORK_WECHAT_ROBOT_KEY;
 
 
 /**
@@ -312,145 +311,122 @@ public class ApplicationFacade {
 
         List<ApplicationDeployConfig> list = applicationAdapter.convertToApplicationDeployConfig(form);
         for (ApplicationDeployConfig config : list) {
-            applicationDeployConfigService.update(config);
+            UpdateWrapper<ApplicationDeployConfig> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("app_code", config.getAppCode());
+            updateWrapper.eq("env", config.getEnv());
+            applicationDeployConfigService.update(config, updateWrapper);
             asyncUtil.doTask(()-> recordApplicationDeployConfigChange(config, operator));
         }
     }
 
+    /**
+     * 记录应用发布配置变更
+     */
     private void recordApplicationDeployConfigChange(ApplicationDeployConfig config, String operator){
         // 查询之前的配置
-        ApplicationDeployConfig existConfig = applicationDeployConfigService.getByAppCodeAndEnv(config.getAppCode(), config.getEnv());
+        ApplicationDeployConfig existConfig = applicationDeployConfigService.getByAppcodeAndEnvCode(config.getAppCode(), config.getEnv());
 
         boolean isEdit = false;
         StringBuilder content = new StringBuilder(String.format("应用: [%s], 环境: [%s] 发布配置修改; ", config.getAppCode(), config.getEnv()));
-        // 比较变化并记录
+        // Gitlab地址
         if (!Objects.equals(existConfig.getGit(), config.getGit())){
             content.append(String.format("Git地址从[%s]修改为[%s]; ", existConfig.getGit(), config.getGit()));
             isEdit = true;
         }
-        if (Objects.nonNull(config.getRunCmd()) && !Objects.equals(existConfig.getRunCmd(), config.getRunCmd())){
-            isEdit = true;
-            content.append(String.format("run_cmd从[%s]修改为[%s]; ", existConfig.getRunCmd(), config.getRunCmd()));
-        }
+        // 健康检查地址
         if (!Objects.equals(existConfig.getHealthCheckUri(), config.getHealthCheckUri())){
             isEdit = true;
             content.append(String.format("HealthCheckUri从[%s]修改为[%s]; ", existConfig.getHealthCheckUri(), config.getHealthCheckUri()));
         }
-        if (!Objects.equals(existConfig.getPkgName(), config.getPkgName())){
+        // 制品名称
+        if (!Objects.equals(existConfig.getArtifactName(), config.getArtifactName())){
             isEdit = true;
-            content.append(String.format("pkgName从[%s]修改为[%s]; ", existConfig.getPkgName(), config.getPkgName()));
+            content.append(String.format("ArtifactName从[%s]修改为[%s]; ", existConfig.getArtifactName(), config.getArtifactName()));
         }
-        if (!Objects.equals(existConfig.getPkgType(), config.getPkgType())){
+        // 制品类型
+        if (!Objects.equals(existConfig.getArtifactType(), config.getArtifactType())){
             isEdit = true;
-            content.append(String.format("pkgType从[%s]修改为[%s]; ", existConfig.getPkgType(), config.getPkgType()));
+            content.append(String.format("ArtifactType从[%s]修改为[%s]; ", existConfig.getArtifactType(), config.getArtifactType()));
         }
-        if (!Objects.equals(existConfig.getPkgType(), config.getPkgType())){
+        // 制品路径
+        if (!Objects.equals(existConfig.getArtifactPath(), config.getArtifactPath())){
             isEdit = true;
-            content.append(String.format("pkgType从[%s]修改为[%s]; ", existConfig.getPkgType(), config.getPkgType()));
+            content.append(String.format("ArtifactPath从[%s]修改为[%s]; ", existConfig.getArtifactPath(), config.getArtifactPath()));
         }
-        if (!Objects.equals(existConfig.getPkgPath(), config.getPkgPath())){
+        // 监听端口
+        if (!Objects.equals(existConfig.getPort(), config.getPort())){
             isEdit = true;
-            content.append(String.format("pkgPath从[%s]修改为[%s]; ", existConfig.getPkgPath(), config.getPkgPath()));
+            content.append(String.format("监听端口(port)从[%s]修改为[%s]; ", existConfig.getPort(), config.getPort()));
         }
-        if (!Objects.equals(existConfig.getHttpPort(), config.getHttpPort())){
-            isEdit = true;
-            content.append(String.format("监听端口(http_port)从[%s]修改为[%s]; ", existConfig.getHttpPort(), config.getHttpPort()));
-        }
+        // 探活方式
         if (!Objects.equals(existConfig.getProbeType(), config.getProbeType())){
             isEdit = true;
             content.append(String.format("探活方式从[%s]修改为[%s]; ", existConfig.getProbeType(), config.getProbeType()));
         }
-        if (!Objects.equals(existConfig.getMergeMaster(), config.getMergeMaster())){
-            isEdit = true;
-            content.append(String.format("merge_master从[%s]修改为[%s]; ", existConfig.getMergeMaster(), config.getMergeMaster()));
-        }
-        if (Objects.nonNull(config.getBuildPath()) && !Objects.equals(existConfig.getBuildPath(), config.getBuildPath())){
-            isEdit = true;
-            content.append(String.format("build_path从[%s]修改为[%s]; ", existConfig.getBuildPath(), config.getBuildPath()));
-        }
+        // BuildExtraArgs
         if (!Objects.equals(existConfig.getBuildExtraArgs(), config.getBuildExtraArgs())){
             isEdit = true;
             content.append(String.format("build_extra_args从[%s]修改为[%s]; ", existConfig.getBuildExtraArgs(), config.getBuildExtraArgs()));
         }
-        if (!Objects.equals(existConfig.getBuildActiveProfile(), config.getBuildActiveProfile())){
+        // Profile
+        if (!Objects.equals(existConfig.getProfile(), config.getProfile())){
             isEdit = true;
-            content.append(String.format("BuildActiveProfile从[%s]修改为[%s]; ", existConfig.getBuildActiveProfile(), config.getBuildActiveProfile()));
+            content.append(String.format("Profile从[%s]修改为[%s]; ", existConfig.getProfile(), config.getProfile()));
         }
+        // 企业微信Token
         if (!Objects.equals(existConfig.getWorkWeixinToken(), config.getWorkWeixinToken())){
             isEdit = true;
             content.append(String.format("getWorkWeixinToken从[%s]修改为[%s]; ", existConfig.getWorkWeixinToken(), config.getWorkWeixinToken()));
         }
+        // 初始延迟秒数
         if (!Objects.equals(existConfig.getInitialDelaySeconds(), config.getInitialDelaySeconds())){
             isEdit = true;
             content.append(String.format("getInitialDelaySeconds从[%s]修改为[%s]; ", existConfig.getInitialDelaySeconds(), config.getInitialDelaySeconds()));
         }
+        // Git提交自动部署
         if (!Objects.equals(existConfig.getAutoDeployOnGitCommit(), config.getAutoDeployOnGitCommit())){
             isEdit = true;
             content.append(String.format("AutoDeployOnGitCommit从[%s]修改为[%s]; ", existConfig.getAutoDeployOnGitCommit(), config.getAutoDeployOnGitCommit()));
         }
-        if (!Objects.equals(existConfig.getAutoDeployOnGitCommit(), config.getAutoDeployOnGitCommit())){
-            isEdit = true;
-            content.append(String.format("AutoDeployOnGitCommit从[%s]修改为[%s]; ", existConfig.getAutoDeployOnGitCommit(), config.getAutoDeployOnGitCommit()));
-        }
+        // 运行时版本
         if (!Objects.equals(existConfig.getRuntimeVersion(), config.getRuntimeVersion())){
             isEdit = true;
             content.append(String.format("RuntimeVersion从[%s]修改为[%s]; ", existConfig.getRuntimeVersion(), config.getRuntimeVersion()));
         }
+        // 容器化
         if (!Objects.equals(existConfig.getContainerized(), config.getContainerized())){
             isEdit = true;
             content.append(String.format("Containerized从[%s]修改为[%s]; ", existConfig.getContainerized(), config.getContainerized()));
         }
+        // RunExtraArgs
         if (!Objects.equals(existConfig.getRunExtraArgs(), config.getRunExtraArgs())){
             isEdit = true;
             content.append(String.format("RunExtraArgs从[%s]修改为[%s]; ", existConfig.getRunExtraArgs(), config.getRunExtraArgs()));
         }
-        if (!Objects.equals(existConfig.getRunExtraArgs(), config.getRunExtraArgs())){
-            isEdit = true;
-            content.append(String.format("RunExtraArgs从[%s]修改为[%s]; ", existConfig.getRunExtraArgs(), config.getRunExtraArgs()));
-        }
+        // KubernetesReplicas
         if (!Objects.equals(existConfig.getKubernetesReplicas(), config.getKubernetesReplicas())){
             isEdit = true;
             content.append(String.format("KubernetesReplicas 从[%s]修改为[%s]; ", existConfig.getKubernetesReplicas(), config.getKubernetesReplicas()));
         }
+        // KubernetesLimitCpu
         if (!Objects.equals(existConfig.getKubernetesLimitCpu(), config.getKubernetesLimitCpu())){
             isEdit = true;
             content.append(String.format("KubernetesLimitCpu 从[%s]修改为[%s]; ", existConfig.getKubernetesLimitCpu(), config.getKubernetesLimitCpu()));
         }
+        // KubernetesLimitMemory
         if (!Objects.equals(existConfig.getKubernetesLimitMemory(), config.getKubernetesLimitMemory())){
             isEdit = true;
             content.append(String.format("KubernetesLimitMemory 从[%s]修改为[%s]; ", existConfig.getKubernetesLimitMemory(), config.getKubernetesLimitMemory()));
         }
+        // KubernetesScheduleStrategy
         if (!Objects.equals(existConfig.getKubernetesScheduleStrategy(), config.getKubernetesScheduleStrategy())){
             isEdit = true;
             content.append(String.format("KubernetesScheduleStrategy 从[%s]修改为[%s]; ", existConfig.getKubernetesScheduleStrategy(), config.getKubernetesScheduleStrategy()));
         }
-        if (!Objects.equals(existConfig.getEnableSubModule(), config.getEnableSubModule())){
-            isEdit = true;
-            content.append(String.format("EnableSubModule 从[%s]修改为[%s]; ", existConfig.getEnableSubModule(), config.getEnableSubModule()));
-        }
-        if (!Objects.equals(existConfig.getSubModuleGit(), config.getSubModuleGit())){
-            isEdit = true;
-            content.append(String.format("SubModuleGit 从[%s]修改为[%s]; ", existConfig.getSubModuleGit(), config.getSubModuleGit()));
-        }
-        if (!Objects.equals(existConfig.getSubModuleDirectory(), config.getSubModuleDirectory())){
-            isEdit = true;
-            content.append(String.format("SubModuleDirectory 从[%s]修改为[%s]; ", existConfig.getSubModuleDirectory(), config.getSubModuleDirectory()));
-        }
-        if (!Objects.equals(existConfig.getSubModuleBranch(), config.getSubModuleBranch())){
-            isEdit = true;
-            content.append(String.format("SubModuleBranch 从[%s]修改为[%s]; ", existConfig.getSubModuleBranch(), config.getSubModuleBranch()));
-        }
-        if (!Objects.equals(existConfig.getLockDeployBranch(), config.getLockDeployBranch())){
-            isEdit = true;
-            content.append(String.format("LockDeployBranch 从[%s]修改为[%s]; ", existConfig.getLockDeployBranch(), config.getLockDeployBranch()));
-        }
+        // DockerfileTemplateName
         if (!Objects.equals(existConfig.getDockerfileTemplateName(), config.getDockerfileTemplateName())){
             isEdit = true;
             content.append(String.format("DockerfileTemplateName 从[%s]修改为[%s]; ", existConfig.getDockerfileTemplateName(), config.getDockerfileTemplateName()));
-        }
-        if (!Objects.equals(existConfig.getAssociatedOnes(), config.getAssociatedOnes())){
-            isEdit = true;
-            content.append(String.format("AssociatedOnes 从[%s]修改为[%s]; ", existConfig.getAssociatedOnes(), config.getAssociatedOnes()));
         }
 
         if (isEdit){
@@ -458,7 +434,7 @@ public class ApplicationFacade {
             record.setCreateUser(operator);
             record.setType(OperationTypeEnum.UPDATE_APPLICATION_DEPLOY_CONFIG.getType());
             record.setContent(content.toString());
-            operationRecordService.createOperationRecord(record);
+            operationRecordService.save(record);
             try{
                 workWechatSender.send(ZEUS_WORK_WECHAT_ROBOT_KEY,
                         JSON.toJSONString(record));
@@ -466,95 +442,61 @@ public class ApplicationFacade {
         }
     }
 
-    public ApplicationConfigVOs.ApplicationDeployConfigVO getApplicationDeployConfigByAppCode(String appCode){
-        ApplicationConfigVOs.ApplicationDeployConfigVO vo = new ApplicationConfigVOs.ApplicationDeployConfigVO();
-        List<ApplicationDeployConfig> list = applicationDeployConfigService.getByAppCode(appCode);
+    public ApplicationDeployConfigVO getApplicationDeployConfigByAppCode(String appCode){
+        ApplicationDeployConfigVO vo = new ApplicationDeployConfigVO();
+        List<ApplicationDeployConfig> list = applicationDeployConfigService.getByAppcode(appCode);
 
         for (ApplicationDeployConfig config : list) {
             // 生产环境
             if (EnvironmentEnum.PROD.getCode().equals(config.getEnv())){
                 // 通用配置
-                ApplicationConfigForms.ApplicationDeployConfigCommon common = new ApplicationConfigForms.ApplicationDeployConfigCommon();
+                ApplicationConfigForm.ApplicationDeployConfigCommon common = new ApplicationConfigForm.ApplicationDeployConfigCommon();
                 BeanUtils.copyProperties(config, common);
                 vo.setCommon(common);
-                ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForms.ApplicationDeployConfigByEnv();
+                ApplicationConfigForm.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForm.ApplicationDeployConfigByEnv();
                 BeanUtils.copyProperties(config, byEnv);
-                byEnv.setLoadType(StringUtils.isEmpty(config.getLoadType()) ? new ArrayList<>() : Arrays.asList(config.getLoadType().split("\\|")));
                 vo.setProd(byEnv);
             } else if (EnvironmentEnum.PRE.getCode().equals(config.getEnv())){
-                ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForms.ApplicationDeployConfigByEnv();
+                ApplicationConfigForm.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForm.ApplicationDeployConfigByEnv();
                 BeanUtils.copyProperties(config, byEnv);
-                byEnv.setLoadType(StringUtils.isEmpty(config.getLoadType()) ? new ArrayList<>() : Arrays.asList(config.getLoadType().split("\\|")));
                 vo.setPre(byEnv);
             } else if (EnvironmentEnum.TEST.getCode().equals(config.getEnv())){
-                ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForms.ApplicationDeployConfigByEnv();
+                ApplicationConfigForm.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForm.ApplicationDeployConfigByEnv();
                 BeanUtils.copyProperties(config, byEnv);
-                byEnv.setLoadType(StringUtils.isEmpty(config.getLoadType()) ? new ArrayList<>() : Arrays.asList(config.getLoadType().split("\\|")));
                 vo.setTest(byEnv);
-            } else if (EnvironmentEnum.DEV.getCode().equals(config.getEnv())){
-                ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForms.ApplicationDeployConfigByEnv();
-                BeanUtils.copyProperties(config, byEnv);
-                byEnv.setLoadType(StringUtils.isEmpty(config.getLoadType()) ? new ArrayList<>() : Arrays.asList(config.getLoadType().split("\\|")));
-                vo.setDev(byEnv);
-            }else if (EnvironmentEnum.GRAY.getCode().equals(config.getEnv())){
-                ApplicationConfigForms.ApplicationDeployConfigByEnv byEnv = new ApplicationConfigForms.ApplicationDeployConfigByEnv();
-                BeanUtils.copyProperties(config, byEnv);
-                byEnv.setLoadType(StringUtils.isEmpty(config.getLoadType()) ? new ArrayList<>() : Arrays.asList(config.getLoadType().split("\\|")));
-                vo.setGray(byEnv);
             }
         }
 
         return vo;
     }
 
+    /**
+     * 获取一个随机的不重复的nodePort
+     */
     public Integer getAvailableNodePort(String envCode) {
         Integer port = null;
-        // 生产环境/预发环境/灰度环境 共用相同的集群, 通过创建单独的namespace来解决, 所以这几个环境的NodePort端口要在一起计算
+        // 生产环境/预发环境 共用相同的集群, 通过创建单独的namespace来解决, 所以这几个环境的NodePort端口要在一起计算
         Set<Integer> existPortSet = new HashSet<>();
+
         if (EnvironmentEnum.TEST.getCode().equals(envCode)){
-            existPortSet = applicationDeployConfigService.getAllNodePortSet(envCode);
+            existPortSet = applicationDeployConfigService.getTotalNodePortByEnvCode(envCode);
         }
         if (
                 EnvironmentEnum.PROD.getCode().equals(envCode)
-                        || EnvironmentEnum.GRAY.getCode().equals(envCode)
                         || EnvironmentEnum.PRE.getCode().equals(envCode) ){
-            existPortSet.addAll(applicationDeployConfigService.getAllNodePortSet(EnvironmentEnum.PROD.getCode()));
-            existPortSet.addAll(applicationDeployConfigService.getAllNodePortSet(EnvironmentEnum.GRAY.getCode()));
-            existPortSet.addAll(applicationDeployConfigService.getAllNodePortSet(EnvironmentEnum.PRE.getCode()));
+            existPortSet.addAll(applicationDeployConfigService.getTotalNodePortByEnvCode(EnvironmentEnum.PROD.getCode()));
+            existPortSet.addAll(applicationDeployConfigService.getTotalNodePortByEnvCode(EnvironmentEnum.PRE.getCode()));
         }
 
         //kubernetes集群的默认nodePort范围是30000-32767, 创建集群的时候应该调整大一点
         boolean verified = false;
         while (!verified){
-            port = RandomUtil.randomInt(30030, 39000);
+            port = RandomUtil.randomInt(30000, 32767);
             if (!existPortSet.contains(port)){
                 verified = true;
             }
         }
         
         return port;
-    }
-
-    /**
-     * 新增了一个灰度环境, 每个应用的灰度环境配置需要都加上
-     */
-    public void generateGrayConfig(){
-        // 获取所有应用生产环境的配置
-        Map<String, ApplicationDeployConfig> prodMap = applicationDeployConfigService.getAllAppCodeProdDeployConfigMap();
-        for (ApplicationDeployConfig value : prodMap.values()) {
-            ApplicationDeployConfig gray = new ApplicationDeployConfig();
-            BeanUtils.copyProperties(value, gray);
-            gray.setId(null);
-            gray.setEnv(EnvironmentEnum.GRAY.getCode());
-            gray.setKubernetesNodePort(0);
-            gray.setKubernetesReplicas(0);
-            gray.setKubernetesNamespace(GrayNamespaceEnum.DEFAULT.getNamespace());
-            try{
-                applicationDeployConfigService.create(gray);
-            } catch (Exception e){
-                log.warn(e.getMessage());
-            }
-
-        }
     }
 }
