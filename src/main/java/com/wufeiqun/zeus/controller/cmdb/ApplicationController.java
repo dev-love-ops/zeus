@@ -1,6 +1,7 @@
 package com.wufeiqun.zeus.controller.cmdb;
 
 import com.wufeiqun.zeus.biz.cmdb.ApplicationFacade;
+import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationConfigForm;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
 import com.wufeiqun.zeus.common.entity.CommonVo;
 import com.wufeiqun.zeus.common.utils.RequestUtil;
@@ -67,5 +68,25 @@ public class ApplicationController {
         User user = RequestUtil.getCurrentUser();
         applicationFacade.processMyFavoriteApplication(appCode, user.getAccount(), false);
         return CommonVo.success();
+    }
+
+    /**
+     * 更新应用发布配置
+     */
+    @PostMapping("/updateApplicationDeployConfig")
+    public CommonVo<Object> updateApplicationDeployConfig(@RequestBody @Valid ApplicationConfigForm.ApplicationDeployConfigForm form){
+        User user = RequestUtil.getCurrentUser();
+        applicationFacade.updateApplicationDeployConfig(form, user.getAccount());
+        return CommonVo.success();
+    }
+
+    @GetMapping("/getApplicationDeployConfigByAppCode/{appCode}")
+    public CommonVo<Object> getApplicationDeployConfigByAppCode(@PathVariable String appCode){
+        return CommonVo.success(applicationFacade.getApplicationDeployConfigByAppCode(appCode));
+    }
+
+    @GetMapping("/getAvailableNodePort/{envCode}")
+    public CommonVo<Object> getAvailableNodePort(@PathVariable String envCode){
+        return CommonVo.success(applicationFacade.getAvailableNodePort(envCode));
     }
 }
