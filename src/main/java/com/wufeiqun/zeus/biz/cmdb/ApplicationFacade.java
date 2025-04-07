@@ -106,19 +106,13 @@ public class ApplicationFacade {
         QueryWrapper<Application> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
         // 模糊查询应用code
-        if (StringUtils.isNotBlank(form.getCode())){
-            queryWrapper.like("code", form.getCode());
-        }
+        queryWrapper.like(StringUtils.isNotBlank(form.getCode()), "code", form.getCode());
         // 模糊查询应用名称
-        if (StringUtils.isNotBlank(form.getName())){
-            queryWrapper.like("name", form.getName());
-        }
+        queryWrapper.like(StringUtils.isNotBlank(form.getName()), "name", form.getName());
         // 是否只显示我收藏的应用
         if (BooleanUtils.isTrue(form.getIsMyFavorite())){
             List<String> appCodeList = userFavoriteApplicationService.getUserFavoriteApplicationList(operator);
-            if (CollectionUtils.isNotEmpty(appCodeList)){
-                queryWrapper.in("code", appCodeList);
-            }
+            queryWrapper.in(CollectionUtils.isNotEmpty(appCodeList),"code", appCodeList);
         }
 
         IPage<Application> page = applicationService.page(pageRequest, queryWrapper);
