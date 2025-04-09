@@ -26,3 +26,8 @@ mybatis-plus:
     default-executor-type: REUSE
     use-actual-param-name: true
 
+gitlab:
+  host: https://gitlab.com
+  access-token: xxx
+  git-addr-prefix: git@gitlab.com
+
