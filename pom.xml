@@ -117,6 +117,12 @@
 			<version>6.0.0-rc.9</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.kubernetes</groupId>
+			<artifactId>client-java</artifactId>
+			<version>18.0.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
