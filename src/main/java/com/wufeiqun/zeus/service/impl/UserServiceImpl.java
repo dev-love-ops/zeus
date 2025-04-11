@@ -1,11 +1,10 @@
 package com.wufeiqun.zeus.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wufeiqun.zeus.dao.Role;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.dao.UserMapper;
 import com.wufeiqun.zeus.service.IUserService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

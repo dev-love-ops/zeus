@@ -6,7 +6,6 @@ import cn.hutool.core.lang.tree.TreeUtil;
 import com.wufeiqun.zeus.dao.Department;
 import com.wufeiqun.zeus.service.IDepartmentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

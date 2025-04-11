@@ -3,7 +3,10 @@ package com.wufeiqun.zeus.biz.cicd;
 import com.wufeiqun.zeus.biz.cicd.entity.CicdDeployContext;
 import com.wufeiqun.zeus.common.exception.ServiceException;
 import io.kubernetes.client.custom.IntOrString;
-import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServicePort;
+import io.kubernetes.client.openapi.models.V1ServiceSpec;
 import io.kubernetes.client.util.Yaml;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -11,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 
 import java.io.IOException;
 import java.io.InputStream;

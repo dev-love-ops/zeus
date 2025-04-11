@@ -1,7 +1,7 @@
 package com.wufeiqun.zeus.service;
 
-import com.wufeiqun.zeus.dao.CicdDeployRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wufeiqun.zeus.dao.CicdDeployRecord;
 
 /**
  * <p>

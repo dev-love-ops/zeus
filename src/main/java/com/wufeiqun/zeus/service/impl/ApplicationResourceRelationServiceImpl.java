@@ -1,9 +1,9 @@
 package com.wufeiqun.zeus.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wufeiqun.zeus.dao.ApplicationResourceRelation;
 import com.wufeiqun.zeus.dao.ApplicationResourceRelationMapper;
 import com.wufeiqun.zeus.service.IApplicationResourceRelationService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,6 +1,5 @@
 package com.wufeiqun.zeus.dao;
 
-import com.wufeiqun.zeus.dao.CicdDeployRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 

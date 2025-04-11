@@ -5,17 +5,10 @@ import com.wufeiqun.zeus.biz.celery.entity.CeleryCicdDeployForm;
 import com.wufeiqun.zeus.biz.cicd.entity.CicdBuildContext;
 import com.wufeiqun.zeus.biz.cicd.entity.CicdDeployContext;
 import com.wufeiqun.zeus.biz.cicd.enums.ArtifactTypeEnum;
-import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
 import com.wufeiqun.zeus.service.IApplicationResourceRelationService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
-import java.util.Arrays;
-
-import static com.wufeiqun.zeus.biz.cicd.enums.ArtifactTypeEnum.STATICFE;
 
 /**
  * @author wufeiqun

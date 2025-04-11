@@ -1,6 +1,5 @@
 package com.wufeiqun.zeus.dao;
 
-import com.wufeiqun.zeus.dao.RoleMenuRelation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 

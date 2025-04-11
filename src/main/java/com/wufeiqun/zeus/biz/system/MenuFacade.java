@@ -14,7 +14,6 @@ import com.wufeiqun.zeus.service.IRoleMenuRelationService;
 import com.wufeiqun.zeus.service.IRoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -11,15 +11,12 @@ import com.wufeiqun.zeus.dao.ApplicationDeployConfig;
 import com.wufeiqun.zeus.service.IApplicationDeployConfigService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
-import static com.wufeiqun.zeus.biz.cicd.enums.ServiceProbeTypeEnum.HTTP;
 import static com.wufeiqun.zeus.common.constant.RedisCacheKey.CICD_RATE_LIMIT_BUILD;
 
 /**

@@ -1,6 +1,5 @@
 package com.wufeiqun.zeus.dao;
 
-import com.wufeiqun.zeus.dao.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;

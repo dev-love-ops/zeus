@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wufeiqun.zeus.biz.system.entity.OperationRecordForm;
-import com.wufeiqun.zeus.biz.system.entity.UserVO;
 import com.wufeiqun.zeus.biz.system.enums.OperationTypeEnum;
 import com.wufeiqun.zeus.dao.OperationRecord;
 import com.wufeiqun.zeus.dao.User;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

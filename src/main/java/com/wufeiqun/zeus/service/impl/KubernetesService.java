@@ -1,23 +1,14 @@
 package com.wufeiqun.zeus.service.impl;
 
 
-import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
-import io.kubernetes.client.PodLogs;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1Pod;
-import io.kubernetes.client.openapi.models.V1PodList;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Call;
-import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * @author wufeiqun

@@ -1,6 +1,5 @@
 package com.wufeiqun.zeus.service.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.exception.ServiceException;
 import com.wufeiqun.zeus.common.utils.sender.WorkWechatSender;
@@ -8,16 +7,17 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.gitlab4j.api.*;
-import org.gitlab4j.api.models.*;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.Branch;
+import org.gitlab4j.api.models.Project;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 

@@ -1,27 +1,22 @@
 package com.wufeiqun.zeus.biz.cmdb;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.wufeiqun.zeus.biz.cicd.enums.ArtifactTypeEnum;
 import com.wufeiqun.zeus.biz.cicd.enums.ServiceProbeTypeEnum;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationConfigForm;
 import com.wufeiqun.zeus.biz.cmdb.entity.ApplicationForm;
 import com.wufeiqun.zeus.biz.cmdb.enums.EnvironmentEnum;
-import com.wufeiqun.zeus.common.entity.SelectVO;
 import com.wufeiqun.zeus.common.exception.ServiceException;
 import com.wufeiqun.zeus.dao.ApplicationDeployConfig;
 import com.wufeiqun.zeus.dao.ApplicationResourceRelation;
-import com.wufeiqun.zeus.dao.Server;
 import com.wufeiqun.zeus.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.wufeiqun.zeus.common.constant.GlobalConstant.CMDB_APPCODE_PREFIX;

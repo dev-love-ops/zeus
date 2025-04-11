@@ -3,7 +3,6 @@ package com.wufeiqun.zeus.biz.cmdb.entity;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 public class ApplicationResourceVO {

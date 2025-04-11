@@ -1,7 +1,6 @@
 package com.wufeiqun.zeus.biz.cicd;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson2.JSON;
 import com.wufeiqun.zeus.biz.cicd.entity.CicdBuildContext;
 import com.wufeiqun.zeus.biz.cicd.entity.CicdBuildRecordVO;
 import com.wufeiqun.zeus.biz.cicd.enums.CicdBuildStatusEnum;
@@ -11,14 +10,10 @@ import com.wufeiqun.zeus.dao.CicdBuildRecord;
 import com.wufeiqun.zeus.dao.User;
 import com.wufeiqun.zeus.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**

@@ -2,15 +2,10 @@ package com.wufeiqun.zeus.common.utils;
 
 import com.wufeiqun.zeus.dao.Menu;
 import com.wufeiqun.zeus.service.IMenuService;
-import com.wufeiqun.zeus.service.IRoleMenuRelationService;
 import com.wufeiqun.zeus.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 
 import java.util.Set;
 import java.util.stream.Collectors;
