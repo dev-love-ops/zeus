@@ -63,40 +63,4 @@ public class CicdDeployAdapter {
         return recordList.stream().map(this::transformToDeployRecord).collect(Collectors.toList());
     }
 
-    public void resolveDeployRecordExample(CicdDeployRecordExample example, CicdDeployForms.DeployRecordQueryForm form){
-        // 默认按照创建时间倒序排列
-        example.setOrderByClause("create_time desc");
-        CicdDeployRecordExample.Criteria criteria = example.createCriteria();
-
-        // 根据构建ID查询
-        if (Objects.nonNull(form.getBuildRecordId())){
-            criteria.andBuildRecordIdEqualTo(form.getBuildRecordId());
-        }
-        // 根据appCode查询
-        if (Objects.nonNull(form.getAppCode())){
-            criteria.andAppCodeEqualTo(form.getAppCode());
-        }
-        // 根据envCode查询
-        if (Objects.nonNull(form.getEnvCode())){
-            criteria.andEnvCodeEqualTo(form.getEnvCode());
-        }
-        // 根据是否为容器部署来查询
-        if (Objects.nonNull(form.getDockerDeploy())){
-            criteria.andDockerDeployEqualTo(form.getDockerDeploy());
-        }
-        // 根据发布模式来查询(快速发布/任务模式)
-        if (Objects.nonNull(form.getDeployMode())){
-            criteria.andDeployModeEqualTo(form.getDeployMode());
-        }
-
-        // 根据操作人
-        if (StringUtils.isNotBlank(form.getCreateUser())){
-            criteria.andCreateUserEqualTo(form.getCreateUser());
-        }
-
-        // 是否是回滚
-        if (Objects.nonNull(form.getIsRollback())){
-            criteria.andRollbackEqualTo(form.getIsRollback());
-        }
-    }
 }

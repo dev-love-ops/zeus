@@ -51,26 +51,6 @@ public class CeleryTaskExecutor {
         return true;
     }
 
-    public boolean doRestart(CeleryCicdRestartForm form){
-        log.info("CeleryTaskExecutor.doRestart, 参数={}", form);
-        String url = taskUrl + CeleryActionEnum.RESTART.getValue();
-        try{
-            JSONObject result = webClient.post()
-                    .uri(url)
-                    .bodyValue(form).retrieve().bodyToMono(JSONObject.class).block();
-            log.info("CeleryTaskExecutor.doRestart, 返回={}", result);
-
-            if (!"0".equals(result.getString("code"))){
-                return false;
-            }
-            return true;
-        } catch (Exception e){
-            log.warn("调用异步任务服务doRestart异常, 参数={}", form, e);
-            return false;
-        }
-
-    }
-
     public boolean doRollback(CeleryCicdDeployForm form){
         log.info("CeleryTaskExecutor.doRollback, 参数={}", form);
         String url = taskUrl + CeleryActionEnum.ROLLBACK.getValue();
