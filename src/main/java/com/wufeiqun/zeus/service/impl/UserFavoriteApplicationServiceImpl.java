@@ -24,7 +24,7 @@ public class UserFavoriteApplicationServiceImpl extends ServiceImpl<UserFavorite
     @Override
     public List<String> getUserFavoriteApplicationList(String account) {
         QueryWrapper<UserFavoriteApplication> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("account", account);
+        queryWrapper.eq("user", account);
         return this.list(queryWrapper).stream().map(UserFavoriteApplication::getAppCode).collect(Collectors.toList());
     }
 }

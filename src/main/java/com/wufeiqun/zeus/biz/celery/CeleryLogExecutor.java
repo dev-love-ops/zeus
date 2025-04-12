@@ -48,7 +48,7 @@ public class CeleryLogExecutor {
                 log.error("readBuildLog error");
                 return readLogVo;
             }
-            ReadLogVO data = resultVo.getData();
+            ReadLogVO data = resultVo.getResult();
 
             readLogVo.setOffset(data.getOffset());
             readLogVo.setLogContent(data.getLogContent());

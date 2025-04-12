@@ -25,21 +25,21 @@ public class CommonVo<T> implements Serializable {
     /**
      * 存放业务数据
      */
-    private T data;
+    private T result;
 
     public static <T> CommonVo<T> success() {
         return new CommonVo<>();
     }
 
-    public static <T> CommonVo<T> success(T data) {
+    public static <T> CommonVo<T> success(T result) {
         CommonVo<T> ret = new CommonVo<>();
-        ret.setData(data);
+        ret.setResult(result);
         return ret;
     }
 
-    public static <T> CommonVo<T> success(T data, String message) {
+    public static <T> CommonVo<T> success(T result, String message) {
         CommonVo<T> ret = new CommonVo<>();
-        ret.setData(data);
+        ret.setResult(result);
         ret.setMessage(message);
         return ret;
     }
